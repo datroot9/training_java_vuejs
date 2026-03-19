@@ -111,14 +111,6 @@ label {
   align-items: center;
 }
 
-.input-icon {
-  position: absolute;
-  left: 12px;
-  width: 20px;
-  height: 20px;
-  color: #999;
-  pointer-events: none;
-}
 
 input {
   width: 100%;
