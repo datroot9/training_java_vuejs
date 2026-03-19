@@ -11,7 +11,6 @@
               v-model="email"
               type="email"
               placeholder="Enter your email"
-              required
             />
           </div>
         </div>
@@ -24,7 +23,6 @@
               v-model="password"
               type="password"
               placeholder="Enter your password"
-              required
             />
           </div>
         </div>
@@ -48,8 +46,16 @@ const password = ref('')
 const href_register = ref('');
 
 const handleLogin = () => {
+  // Validation check
+  if (!email.value || !password.value) {
+    alert('Error: Please enter both email and password')
+    return
+  }
+
   console.log('Email:', email.value)
   console.log('Password:', password.value)
+  // Demo login
+  alert('Login successful! Welcome back.')
   // Add your login logic here
 }
 </script>
