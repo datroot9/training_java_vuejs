@@ -10,9 +10,11 @@
               id="email"
               v-model="email"
               type="email"
+              maxlength="20"
               placeholder="Enter your email"
             />
           </div>
+          <span v-if="isSubmitted && emailError" class="length-warning">{{ emailError }}</span>
         </div>
 
         <div class="form-group">
@@ -22,9 +24,11 @@
               id="password"
               v-model="password"
               type="password"
+              maxlength="15"
               placeholder="Enter your password"
             />
           </div>
+          <span v-if="isSubmitted && passwordError" class="length-warning">{{ passwordError }}</span>
         </div>
 
         <button type="submit" class="login-btn">Login</button>
@@ -38,18 +42,43 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { User as UserIcon, Lock as LockIcon } from 'lucide-vue-next'
 
 const email = ref('')
 const password = ref('')
 const href_register = ref('');
+const isSubmitted = ref(false); // Cờ lưu trạng thái đã bấm nút Login
+
+// Validation kiểm tra Email liên tục
+const emailError = computed(() => {
+  if (!email.value) return 'Email is required';
+  
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email.value)) return 'Invalid email format';
+  
+  if (email.value.length >= 20) return 'Your email must be less than 20 characters';
+  
+  return '';
+});
+
+// Validation kiểm tra Password liên tục
+const passwordError = computed(() => {
+  if (!password.value) return 'Password is required';
+  
+  if (password.value.length < 6) return 'Your password must be at least 6 characters';
+  
+  if (password.value.length >= 15) return 'Your password must be less than 15 characters';
+  
+  return '';
+});
 
 const handleLogin = () => {
-  // Validation check
-  if (!email.value || !password.value) {
-    alert('Error: Please enter both email and password')
-    return
+  isSubmitted.value = true; // Bật cờ đã submit để hiển thị thông báo lỗi (nếu có)
+  
+  // Dừng lại nếu emailError hoặc passwordError có chứa thông báo lỗi (không phải là chuỗi rỗng '')
+  if (emailError.value || passwordError.value) {
+    return;
   }
 
   console.log('Email:', email.value)
@@ -96,6 +125,13 @@ label {
   margin-bottom: 8px;
   color: #555;
   font-weight: 500;
+}
+
+.length-warning {
+  color: #ff4d4f;
+  font-size: 13px;
+  margin-top: 6px;
+  padding-left: 4px;
 }
 
 .input-wrapper {
