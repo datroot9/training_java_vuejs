@@ -60,15 +60,15 @@ export const Default: Story = {};
 export const CheckMaxLength: Story = {
   play: async({canvasElement}) => {
     const canvas = within(canvasElement);
-    const emailInput = canvas.getByPlaceholderText('Enter your email');
+    const userNameInput = canvas.getByPlaceholderText('Enter your user name');
     const passwordInput = canvas.getByPlaceholderText('Enter your password');
     const loginButton = canvas.getByRole('button', { name: /Login/i });
 
     const longEmail = '1234567890@1234567890.com';
     
-    await moveCursorTo(emailInput, canvasElement);
-    await userEvent.click(emailInput);
-    await userEvent.type(emailInput, longEmail, { delay: 50 });
+    await moveCursorTo(userNameInput, canvasElement);
+    await userEvent.click(userNameInput);
+    await userEvent.type(userNameInput, longEmail, { delay: 50 });
     await sleep(200);
 
     await moveCursorTo(passwordInput, canvasElement);
@@ -86,13 +86,13 @@ export const FilledFormAndSubmit: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    const emailInput = canvas.getByPlaceholderText('Enter your email');
+    const userNameInput = canvas.getByPlaceholderText('Enter your user name');
     const passwordInput = canvas.getByPlaceholderText('Enter your password');
     const loginButton = canvas.getByRole('button', { name: /Login/i });
 
-    await moveCursorTo(emailInput, canvasElement);
-    await userEvent.click(emailInput);
-    await userEvent.type(emailInput, 'test@example.com', { delay: 100 });
+    await moveCursorTo(userNameInput, canvasElement);
+    await userEvent.click(userNameInput);
+    await userEvent.type(userNameInput, 'test@example.com', { delay: 100 });
     await sleep(200);
 
     await moveCursorTo(passwordInput, canvasElement);
@@ -110,13 +110,13 @@ export const CheckEmptyInput: Story = {
   play: async({canvasElement}) => {
     const canvas = within(canvasElement);
     
-    const emailInput = canvas.getByPlaceholderText('Enter your email');
+    const userNameInput = canvas.getByPlaceholderText('Enter your user name');
     const passwordInput = canvas.getByPlaceholderText('Enter your password');
     const loginButton = canvas.getByRole('button', { name: /Login/i });
 
     // 1. Chuột bay tới và click vào ô email
-    await moveCursorTo(emailInput, canvasElement);
-    await userEvent.click(emailInput);
+    await moveCursorTo(userNameInput, canvasElement);
+    await userEvent.click(userNameInput);
     await sleep(300);
 
     // 2. Chuột bay tới và click vào ô password
@@ -135,14 +135,14 @@ export const CheckMinPasswordLength: Story = {
   play: async({canvasElement}) => {
     const canvas = within(canvasElement);
     
-    const emailInput = canvas.getByPlaceholderText('Enter your email');
+    const userNameInput = canvas.getByPlaceholderText('Enter your user name');
     const passwordInput = canvas.getByPlaceholderText('Enter your password');
     const loginButton = canvas.getByRole('button', { name: /Login/i });
 
     // 1. Di chuột và nhập một email hợp lệ để vượt qua bước check email
-    await moveCursorTo(emailInput, canvasElement);
-    await userEvent.click(emailInput);
-    await userEvent.type(emailInput, 'testuser@gmail.com', { delay: 50 });
+    await moveCursorTo(userNameInput, canvasElement);
+    await userEvent.click(userNameInput);
+    await userEvent.type(userNameInput, 'testuser@gmail.com', { delay: 50 });
     await sleep(200);
 
     // 2. Di chuột và cố tình nhập password chỉ có 5 ký tự (< 6 ký tự chuẩn)
@@ -162,14 +162,14 @@ export const CheckInvalidByteInputs: Story = {
   play: async({canvasElement}) => {
     const canvas = within(canvasElement);
     
-    const emailInput = canvas.getByPlaceholderText('Enter your email');
+    const userNameInput = canvas.getByPlaceholderText('Enter your user name');
     const passwordInput = canvas.getByPlaceholderText('Enter your password');
     const loginButton = canvas.getByRole('button', { name: /Login/i });
 
     // 1. Cố tình nhập email có dấu (Ký tự > 1 byte)
-    await moveCursorTo(emailInput, canvasElement);
-    await userEvent.click(emailInput);
-    await userEvent.type(emailInput, 'tài@khoản.com', { delay: 50 });
+    await moveCursorTo(userNameInput, canvasElement);
+    await userEvent.click(userNameInput);
+    await userEvent.type(userNameInput, 'tài@khoản.com', { delay: 50 });
     await sleep(200);
 
     // 2. Cố tình nhập chuỗi có dấu tiếng Việt và Emoji vào password (Ký tự > 1 byte)

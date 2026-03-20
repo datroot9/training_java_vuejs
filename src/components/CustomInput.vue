@@ -11,6 +11,10 @@
         :type="inputType"
         :maxlength="maxlength"
         :placeholder="placeholder"
+        :class="{ 
+          'has-prefix-icon': !!$slots.icon,
+          'has-suffix-icon': type === 'password' 
+        }"
       />
 
       <!-- Icon Mắt ẩn/hiện chỉ render khi type truyền vào là password -->
@@ -76,6 +80,24 @@ const onInput = (event: Event) => {
   align-items: center;
 }
 
+input {
+  width: 100%;
+  padding: 10px 12px; /* Mặc định lề 2 bên thu gọn gọn gàng 12px nếu rỗng tuếch */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+input.has-prefix-icon {
+  padding-left: 40px; /* Thêm lề trái nếu có slot icon */
+}
+
+input.has-suffix-icon {
+  padding-right: 40px; /* Thêm lề phải chừa không gian cho Con Mắt nếu type là password */
+}
+
 /* Định dạng thẻ slot chứa icon bên trái */
 :slotted(.input-icon) {
   position: absolute;
@@ -84,16 +106,6 @@ const onInput = (event: Event) => {
   height: 20px;
   color: #999;
   pointer-events: none;
-}
-
-input {
-  width: 100%;
-  padding: 10px 40px 10px 40px; /* Căn pad cả 2 bên cho cân đối icon */
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-  transition: border-color 0.3s;
-  box-sizing: border-box;
 }
 
 input:focus {

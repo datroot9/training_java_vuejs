@@ -35,21 +35,26 @@
 import { ref, computed } from 'vue'
 import { User as UserIcon, Lock as LockIcon } from 'lucide-vue-next'
 import CustomInput from './CustomInput.vue'
+import { useValidation } from '@/composables/useValidation'
 
-const email = ref('')
+const userName = ref('')
 const password = ref('')
 const isSubmitted = ref(false); // Cờ lưu trạng thái đã bấm nút Login
+
+const { validateUserName, validatePassword } = useValidation();
+const userNameError = validateUserName(userName);
+const passwordError = validatePassword(password);
 
 // Mảng cấu hình cho các input field dùng chung
 const formFields = computed(() => [
   {
-    id: 'email',
-    value: email.value,
-    update: (val: string) => email.value = val,
+    id: 'user_name',
+    value: userName.value,
+    update: (val: string) => userName.value = val,
     type: 'text',
     maxlength: 20,
-    placeholder: 'Enter your email',
-    error: emailError.value,
+    placeholder: 'Email address',
+    error: userNameError.value,
     icon: UserIcon
   },
   {
@@ -64,52 +69,16 @@ const formFields = computed(() => [
   }
 ]);
 
-// Validation kiểm tra Email liên tục
-const emailError = computed(() => {
-  if (!email.value) return 'Email is required';
-  
-  // check email có chứa ký tự lạ hoặc emoji không
-  if (/[^\x00-\xff]/.test(email.value)) {
-    return 'Email must not contain multi-byte characters or emojis';
-  }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email.value)) return 'Invalid email format';
-  
-  if (email.value.length >= 20) return 'Your email must be less than 20 characters';
-  
-  return '';
-});
-
-// Validation kiểm tra Password liên tục
-const passwordError = computed(() => {
-  if (!password.value) return 'Password is required';
-
-  // check password có chứa ký tự lạ hoặc emoji không
-   if (/[^\x00-\xff]/.test(password.value)) {
-     return 'Password must not contain multi-byte characters or emojis';
-  }
-
-
-  if (password.value.length < 6) return 'Your password must be at least 6 characters';
-  
-  if (password.value.length >= 15) return 'Your password must be less than 15 characters';
-  
-  return '';
-});
-
 const handleLogin = () => {
   isSubmitted.value = true; // Bật cờ đã submit để hiển thị thông báo lỗi (nếu có)
   
-  // Dừng lại nếu emailError hoặc passwordError có chứa thông báo lỗi (không phải là chuỗi rỗng '')
-  if (emailError.value || passwordError.value) {
-    return;
+  if (userNameError.value || passwordError.value) {
+    return; // Block không cho in ra console nếu đang có lỗi
   }
 
-  console.log('Email:', email.value)
+  console.log('User name:', userName.value)
   console.log('Password:', password.value)
-  // Demo login
-  alert('Login successful! Welcome back.')
+  alert('Login successful!')
   // Add your login logic here
 }
 </script>

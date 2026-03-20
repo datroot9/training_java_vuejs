@@ -55,13 +55,13 @@ export const Default: Story = {};
 export const CheckEmptyInput: Story = {
   play: async({canvasElement}) => {
     const canvas = within(canvasElement);
-    const emailInput = canvas.getByPlaceholderText('Email');
+    const userNameInput = canvas.getByPlaceholderText('User name');
     const passwordInput = canvas.getByPlaceholderText('Password');
     const confirmPasswordInput = canvas.getByPlaceholderText('Confirm password');
     const registerButton = canvas.getByRole('button', { name: /Register/i });
 
     // Dạo chuột 1 vòng cho vui
-    await moveCursorTo(emailInput, canvasElement);
+    await moveCursorTo(userNameInput, canvasElement);
     await sleep(200);
     await moveCursorTo(passwordInput, canvasElement);
     await sleep(200);
@@ -78,14 +78,14 @@ export const CheckEmptyInput: Story = {
 export const CheckMinPasswordLength: Story = {
   play: async({canvasElement}) => {
     const canvas = within(canvasElement);
-    const emailInput = canvas.getByPlaceholderText('Email');
+    const userNameInput = canvas.getByPlaceholderText('User name');
     const passwordInput = canvas.getByPlaceholderText('Password');
     const confirmPasswordInput = canvas.getByPlaceholderText('Confirm password');
     const registerButton = canvas.getByRole('button', { name: /Register/i });
 
-    await moveCursorTo(emailInput, canvasElement);
-    await userEvent.click(emailInput);
-    await userEvent.type(emailInput, 'valid@email.com', { delay: 50 });
+    await moveCursorTo(userNameInput, canvasElement);
+    await userEvent.click(userNameInput);
+    await userEvent.type(userNameInput, 'valid@email.com', { delay: 50 });
     await sleep(200);
 
     // Mật khẩu siêu ngắn
@@ -108,14 +108,14 @@ export const CheckMinPasswordLength: Story = {
 export const PasswordMismatch: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const emailInput = canvas.getByPlaceholderText('Email');
+    const userNameInput = canvas.getByPlaceholderText('User name');
     const passwordInput = canvas.getByPlaceholderText('Password');
     const confirmPasswordInput = canvas.getByPlaceholderText('Confirm password');
     const registerButton = canvas.getByRole('button', { name: /Register/i });
 
-    await moveCursorTo(emailInput, canvasElement);
-    await userEvent.click(emailInput);
-    await userEvent.type(emailInput, 'newuser@domain.com', { delay: 50 });
+    await moveCursorTo(userNameInput, canvasElement);
+    await userEvent.click(userNameInput);
+    await userEvent.type(userNameInput, 'newuser@domain.com', { delay: 50 });
     await sleep(200);
 
     await moveCursorTo(passwordInput, canvasElement);
@@ -139,13 +139,13 @@ export const CheckInvalidByteInputs: Story = {
   play: async({canvasElement}) => {
     const canvas = within(canvasElement);
     
-    const emailInput = canvas.getByPlaceholderText('Email');
+    const userNameInput = canvas.getByPlaceholderText('User name');
     const passwordInput = canvas.getByPlaceholderText('Password');
     const registerButton = canvas.getByRole('button', { name: /Register/i });
 
-    await moveCursorTo(emailInput, canvasElement);
-    await userEvent.click(emailInput);
-    await userEvent.type(emailInput, 'tài@khoản.com', { delay: 50 });
+    await moveCursorTo(userNameInput, canvasElement);
+    await userEvent.click(userNameInput);
+    await userEvent.type(userNameInput, 'tài@khoản.com', { delay: 50 });
     await sleep(200);
 
     await moveCursorTo(passwordInput, canvasElement);
@@ -171,14 +171,14 @@ export const FilledFormAndSubmit: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    const emailInput = canvas.getByPlaceholderText('Email');
+    const userNameInput = canvas.getByPlaceholderText('User name');
     const passwordInput = canvas.getByPlaceholderText('Password');
     const confirmPasswordInput = canvas.getByPlaceholderText('Confirm password');
     const registerButton = canvas.getByRole('button', { name: /Register/i });
 
-    await moveCursorTo(emailInput, canvasElement);
-    await userEvent.click(emailInput);
-    await userEvent.type(emailInput, 'newuser@domain.com', { delay: 50 });
+    await moveCursorTo(userNameInput, canvasElement);
+    await userEvent.click(userNameInput);
+    await userEvent.type(userNameInput, 'newuser@domain.com', { delay: 50 });
     await sleep(200);
 
     await moveCursorTo(passwordInput, canvasElement);
