@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import LoginForm from "@/components/LoginForm.vue";
-import RegisterForm from "@/components/RegisterForm.vue";
+import { RouterView } from 'vue-router'
 </script>
 
 <template>
- <LoginForm/>
-  <!-- <RegisterForm/> -->
+  <!-- RouterView là cái "màn hình chiếu", tuỳ theo URL mà nó sẽ chiếu LoginForm hay RegisterForm lên đây -->
+  <RouterView />
 </template>
 
 <style scoped></style>

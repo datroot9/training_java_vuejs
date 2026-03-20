@@ -2,41 +2,31 @@
   <div class="login-wrapper">
     <div class="login-container">
       <h1>Login</h1>
-      <form @submit.prevent="handleLogin">
-        <div class="form-group">
-          <div class="input-wrapper">
-            <UserIcon class="input-icon" />
-            <input
-              id="email"
-              v-model="email"
-              type="email"
-              maxlength="20"
-              placeholder="Enter your email"
-            />
-          </div>
-          <span v-if="isSubmitted && emailError" class="length-warning">{{ emailError }}</span>
-        </div>
-
-        <div class="form-group">
-          <div class="input-wrapper">
-            <LockIcon class="input-icon" />
-            <input
-              id="password"
-              v-model="password"
-              type="password"
-              maxlength="15"
-              placeholder="Enter your password"
-            />
-          </div>
-          <span v-if="isSubmitted && passwordError" class="length-warning">{{ passwordError }}</span>
-        </div>
+      <!-- Đặt novalidate để tắt hoàn toàn bong bóng popup báo lỗi mặc định của HTML5 -->
+      <form @submit.prevent="handleLogin" novalidate>
+        <!-- Tái chế component CustomInput qua v-for array -->
+        <CustomInput
+          v-for="field in formFields"
+          :key="field.id"
+          :id="field.id"
+          :modelValue="field.value"
+          @update:modelValue="field.update"
+          :type="field.type"
+          :maxlength="field.maxlength"
+          :placeholder="field.placeholder"
+          :error="isSubmitted ? field.error : ''"
+        >
+          <template #icon>
+            <component :is="field.icon" class="input-icon" />
+          </template>
+        </CustomInput>
 
         <button type="submit" class="login-btn">Login</button>
       </form>
     </div>
 
     <div class="sign-up-options">
-      <p>Don't have an account? <a :href="href_register" >Register</a></p>
+      <p>Don't have an account? <RouterLink to="/register">Register</RouterLink></p>
     </div>
   </div>
 </template>
@@ -44,16 +34,45 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { User as UserIcon, Lock as LockIcon } from 'lucide-vue-next'
+import CustomInput from './CustomInput.vue'
 
 const email = ref('')
 const password = ref('')
-const href_register = ref('');
 const isSubmitted = ref(false); // Cờ lưu trạng thái đã bấm nút Login
+
+// Mảng cấu hình cho các input field dùng chung
+const formFields = computed(() => [
+  {
+    id: 'email',
+    value: email.value,
+    update: (val: string) => email.value = val,
+    type: 'text',
+    maxlength: 20,
+    placeholder: 'Enter your email',
+    error: emailError.value,
+    icon: UserIcon
+  },
+  {
+    id: 'password',
+    value: password.value,
+    update: (val: string) => password.value = val,
+    type: 'password',
+    maxlength: 15,
+    placeholder: 'Enter your password',
+    error: passwordError.value,
+    icon: LockIcon
+  }
+]);
 
 // Validation kiểm tra Email liên tục
 const emailError = computed(() => {
   if (!email.value) return 'Email is required';
   
+  // check email có chứa ký tự lạ hoặc emoji không
+  if (/[^\x00-\xff]/.test(email.value)) {
+    return 'Email must not contain multi-byte characters or emojis';
+  }
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email.value)) return 'Invalid email format';
   
@@ -65,7 +84,13 @@ const emailError = computed(() => {
 // Validation kiểm tra Password liên tục
 const passwordError = computed(() => {
   if (!password.value) return 'Password is required';
-  
+
+  // check password có chứa ký tự lạ hoặc emoji không
+   if (/[^\x00-\xff]/.test(password.value)) {
+     return 'Password must not contain multi-byte characters or emojis';
+  }
+
+
   if (password.value.length < 6) return 'Your password must be at least 6 characters';
   
   if (password.value.length >= 15) return 'Your password must be less than 15 characters';
@@ -115,55 +140,7 @@ h1 {
   margin-bottom: 30px;
 }
 
-.form-group {
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-label {
-  margin-bottom: 8px;
-  color: #555;
-  font-weight: 500;
-}
-
-.length-warning {
-  color: #ff4d4f;
-  font-size: 13px;
-  margin-top: 6px;
-  padding-left: 4px;
-}
-
-.input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.input-icon {
-  position: absolute;
-  left: 12px;
-  width: 20px;
-  height: 20px;
-  color: #999;
-  pointer-events: none;
-}
-
-input {
-  width: 100%;
-  padding: 10px 10px 10px 40px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-  transition: border-color 0.3s;
-  box-sizing: border-box;
-}
-
-input:focus {
-  outline: none;
-  border-color: #4CAF50;
-  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
-}
+/* Các class css rườm rà của input đã được dọn sang nhà mới CustomInput.vue ^.^ */
 
 .login-btn {
   width: 100%;

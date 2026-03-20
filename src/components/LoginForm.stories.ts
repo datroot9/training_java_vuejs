@@ -156,3 +156,36 @@ export const CheckMinPasswordLength: Story = {
     await userEvent.click(loginButton);
   }
 }
+
+// case 6: check invalid multi-byte characters cho cả 2 input
+export const CheckInvalidByteInputs: Story = {
+  play: async({canvasElement}) => {
+    const canvas = within(canvasElement);
+    
+    const emailInput = canvas.getByPlaceholderText('Enter your email');
+    const passwordInput = canvas.getByPlaceholderText('Enter your password');
+    const loginButton = canvas.getByRole('button', { name: /Login/i });
+
+    // 1. Cố tình nhập email có dấu (Ký tự > 1 byte)
+    await moveCursorTo(emailInput, canvasElement);
+    await userEvent.click(emailInput);
+    await userEvent.type(emailInput, 'tài@khoản.com', { delay: 50 });
+    await sleep(200);
+
+    // 2. Cố tình nhập chuỗi có dấu tiếng Việt và Emoji vào password (Ký tự > 1 byte)
+    await moveCursorTo(passwordInput, canvasElement);
+    await userEvent.click(passwordInput);
+    await userEvent.type(passwordInput, 'MậtKhẩu🚀', { delay: 50 });
+    await sleep(200);
+
+    // 2b. Bấm vào icon "Con mắt" để hiển thị tường minh kho password thực tế user đã gõ ảo
+    const toggleEyeButton = canvas.getByTestId('toggle-password');
+    await moveCursorTo(toggleEyeButton, canvasElement);
+    await userEvent.click(toggleEyeButton);
+    await sleep(400);
+
+    // 3. Bấm Login để kích hoạt cờ isSubmitted và check thông báo báo lỗi Regex
+    await moveCursorTo(loginButton, canvasElement);
+    await userEvent.click(loginButton);
+  }
+}
