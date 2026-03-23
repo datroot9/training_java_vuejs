@@ -29,4 +29,21 @@ const router = createRouter({
   ]
 })
 
+// Configure Global Route Guards to securely handle authenticated session redirects
+router.beforeEach((to, from, next) => {
+  // Check if our user token exists dynamically in browser memory
+  const isLoggedIn = !!localStorage.getItem('loggedInUser');
+
+  if (isLoggedIn && (to.path === '/login' || to.path === '/register' || to.path === '/')) {
+    // Prevent authenticated users from visiting the login or register pages natively
+    next('/screens');
+  } else if (!isLoggedIn && to.path === '/screens') {
+    // Block unauthenticated guests from bypassing the login page directly into the dashboard!
+    next('/login');
+  } else {
+    // Safely execute all other normal paths
+    next();
+  }
+});
+
 export default router
