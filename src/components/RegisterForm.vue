@@ -51,7 +51,7 @@ const formFields = computed(() => [
     update: (val: string) => userName.value = val,
     type: 'text',
     maxlength: 20,
-    placeholder: 'Email',
+    placeholder: 'Email address',
     error: userNameError.value
   },
   {

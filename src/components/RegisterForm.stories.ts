@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite';
-import { userEvent, within } from 'storybook/test';
+import { userEvent, within, expect } from 'storybook/test';
 import RegisterForm from './RegisterForm.vue';
 import cursorIconUrl from '@/assets/cursor.png';
 
@@ -55,7 +55,7 @@ export const Default: Story = {};
 export const CheckEmptyInput: Story = {
   play: async({canvasElement}) => {
     const canvas = within(canvasElement);
-    const userNameInput = canvas.getByPlaceholderText('User name');
+    const userNameInput = canvas.getByPlaceholderText('Email address');
     const passwordInput = canvas.getByPlaceholderText('Password');
     const confirmPasswordInput = canvas.getByPlaceholderText('Confirm password');
     const registerButton = canvas.getByRole('button', { name: /Register/i });
@@ -71,6 +71,13 @@ export const CheckEmptyInput: Story = {
     // Bấm thẳng nút Register
     await moveCursorTo(registerButton, canvasElement);
     await userEvent.click(registerButton);
+
+    const emailError = await canvas.findByText('User name is required');
+    const passwordError = await canvas.findByText('Password is required');
+    const confirmPasswordError = await canvas.findByText('Please confirm your password');
+    await expect(emailError).toBeInTheDocument();
+    await expect(passwordError).toBeInTheDocument();
+    await expect(confirmPasswordError).toBeInTheDocument();
   }
 }
 
@@ -78,7 +85,7 @@ export const CheckEmptyInput: Story = {
 export const CheckMinPasswordLength: Story = {
   play: async({canvasElement}) => {
     const canvas = within(canvasElement);
-    const userNameInput = canvas.getByPlaceholderText('User name');
+    const userNameInput = canvas.getByPlaceholderText('Email address');
     const passwordInput = canvas.getByPlaceholderText('Password');
     const confirmPasswordInput = canvas.getByPlaceholderText('Confirm password');
     const registerButton = canvas.getByRole('button', { name: /Register/i });
@@ -101,6 +108,9 @@ export const CheckMinPasswordLength: Story = {
 
     await moveCursorTo(registerButton, canvasElement);
     await userEvent.click(registerButton);
+
+    const passwordError = await canvas.findByText('Your password must be at least 6 characters');
+    await expect(passwordError).toBeInTheDocument();
   }
 }
 
@@ -108,7 +118,7 @@ export const CheckMinPasswordLength: Story = {
 export const PasswordMismatch: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const userNameInput = canvas.getByPlaceholderText('User name');
+    const userNameInput = canvas.getByPlaceholderText('Email address');
     const passwordInput = canvas.getByPlaceholderText('Password');
     const confirmPasswordInput = canvas.getByPlaceholderText('Confirm password');
     const registerButton = canvas.getByRole('button', { name: /Register/i });
@@ -131,6 +141,9 @@ export const PasswordMismatch: Story = {
     // Bấm xem lỗi
     await moveCursorTo(registerButton, canvasElement);
     await userEvent.click(registerButton);
+
+    const mismatchError = await canvas.findByText('Passwords do not match');
+    await expect(mismatchError).toBeInTheDocument();
   },
 };
 
@@ -139,7 +152,7 @@ export const CheckInvalidByteInputs: Story = {
   play: async({canvasElement}) => {
     const canvas = within(canvasElement);
     
-    const userNameInput = canvas.getByPlaceholderText('User name');
+    const userNameInput = canvas.getByPlaceholderText('Email address');
     const passwordInput = canvas.getByPlaceholderText('Password');
     const registerButton = canvas.getByRole('button', { name: /Register/i });
 
@@ -163,6 +176,11 @@ export const CheckInvalidByteInputs: Story = {
 
     await moveCursorTo(registerButton, canvasElement);
     await userEvent.click(registerButton);
+
+    const emailError = await canvas.findByText('User name must not contain multi-byte characters or emojis');
+    const passwordError = await canvas.findByText('Password must not contain multi-byte characters or emojis');
+    await expect(emailError).toBeInTheDocument();
+    await expect(passwordError).toBeInTheDocument();
   }
 }
 
@@ -171,7 +189,7 @@ export const FilledFormAndSubmit: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    const userNameInput = canvas.getByPlaceholderText('User name');
+    const userNameInput = canvas.getByPlaceholderText('Email address');
     const passwordInput = canvas.getByPlaceholderText('Password');
     const confirmPasswordInput = canvas.getByPlaceholderText('Confirm password');
     const registerButton = canvas.getByRole('button', { name: /Register/i });
@@ -193,5 +211,8 @@ export const FilledFormAndSubmit: Story = {
 
     await moveCursorTo(registerButton, canvasElement);
     await userEvent.click(registerButton);
+
+    const emailError = canvas.queryByText('User name is required');
+    await expect(emailError).not.toBeInTheDocument();
   },
 };

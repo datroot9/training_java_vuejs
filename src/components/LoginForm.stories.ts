@@ -60,7 +60,7 @@ export const Default: Story = {};
 export const CheckMaxLength: Story = {
   play: async({canvasElement}) => {
     const canvas = within(canvasElement);
-    const userNameInput = canvas.getByPlaceholderText('Enter your user name');
+    const userNameInput = canvas.getByPlaceholderText('Email address');
     const passwordInput = canvas.getByPlaceholderText('Enter your password');
     const loginButton = canvas.getByRole('button', { name: /Login/i });
 
@@ -78,6 +78,9 @@ export const CheckMaxLength: Story = {
    
     await moveCursorTo(loginButton, canvasElement);
     await userEvent.click(loginButton);
+
+    const errorMessage = await canvas.findByText('Invalid user name format');
+    await expect(errorMessage).toBeInTheDocument();
   }
 }
 
@@ -86,7 +89,7 @@ export const FilledFormAndSubmit: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    const userNameInput = canvas.getByPlaceholderText('Enter your user name');
+    const userNameInput = canvas.getByPlaceholderText('Email address');
     const passwordInput = canvas.getByPlaceholderText('Enter your password');
     const loginButton = canvas.getByRole('button', { name: /Login/i });
 
@@ -102,6 +105,9 @@ export const FilledFormAndSubmit: Story = {
 
     await moveCursorTo(loginButton, canvasElement);
     await userEvent.click(loginButton);
+
+    const emailError = canvas.queryByText('User name is required');
+    await expect(emailError).not.toBeInTheDocument();
   },
 };
 
@@ -110,7 +116,7 @@ export const CheckEmptyInput: Story = {
   play: async({canvasElement}) => {
     const canvas = within(canvasElement);
     
-    const userNameInput = canvas.getByPlaceholderText('Enter your user name');
+    const userNameInput = canvas.getByPlaceholderText('Email address');
     const passwordInput = canvas.getByPlaceholderText('Enter your password');
     const loginButton = canvas.getByRole('button', { name: /Login/i });
 
@@ -127,6 +133,11 @@ export const CheckEmptyInput: Story = {
     // 3. Chuột bay tới nút Login và click
     await moveCursorTo(loginButton, canvasElement);
     await userEvent.click(loginButton);
+
+    const emailError = await canvas.findByText('User name is required');
+    const passwordError = await canvas.findByText('Password is required');
+    await expect(emailError).toBeInTheDocument();
+    await expect(passwordError).toBeInTheDocument();
   }
 }
 
@@ -135,7 +146,7 @@ export const CheckMinPasswordLength: Story = {
   play: async({canvasElement}) => {
     const canvas = within(canvasElement);
     
-    const userNameInput = canvas.getByPlaceholderText('Enter your user name');
+    const userNameInput = canvas.getByPlaceholderText('Email address');
     const passwordInput = canvas.getByPlaceholderText('Enter your password');
     const loginButton = canvas.getByRole('button', { name: /Login/i });
 
@@ -154,6 +165,9 @@ export const CheckMinPasswordLength: Story = {
     // 3. Click nút Login để xem màn hình có báo lỗi đỏ 6 ký tự không
     await moveCursorTo(loginButton, canvasElement);
     await userEvent.click(loginButton);
+
+    const passwordError = await canvas.findByText('Your password must be at least 6 characters');
+    await expect(passwordError).toBeInTheDocument();
   }
 }
 
@@ -162,7 +176,7 @@ export const CheckInvalidByteInputs: Story = {
   play: async({canvasElement}) => {
     const canvas = within(canvasElement);
     
-    const userNameInput = canvas.getByPlaceholderText('Enter your user name');
+    const userNameInput = canvas.getByPlaceholderText('Email address');
     const passwordInput = canvas.getByPlaceholderText('Enter your password');
     const loginButton = canvas.getByRole('button', { name: /Login/i });
 
@@ -187,5 +201,10 @@ export const CheckInvalidByteInputs: Story = {
     // 3. Bấm Login để kích hoạt cờ isSubmitted và check thông báo báo lỗi Regex
     await moveCursorTo(loginButton, canvasElement);
     await userEvent.click(loginButton);
+
+    const emailError = await canvas.findByText('User name must not contain multi-byte characters or emojis');
+    const passwordError = await canvas.findByText('Password must not contain multi-byte characters or emojis');
+    await expect(emailError).toBeInTheDocument();
+    await expect(passwordError).toBeInTheDocument();
   }
 }
