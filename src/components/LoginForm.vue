@@ -35,11 +35,13 @@
 import { ref, computed } from 'vue'
 import { User as UserIcon, Lock as LockIcon } from 'lucide-vue-next'
 import CustomInput from './CustomInput.vue'
+import { useRouter } from 'vue-router'
 import { useValidation } from '@/composables/useValidation'
 
 const userName = ref('')
 const password = ref('')
 const isSubmitted = ref(false); // Cờ lưu trạng thái đã bấm nút Login
+const router = useRouter();
 
 const { validateUserName, validatePassword } = useValidation();
 const userNameError = validateUserName(userName);
@@ -78,8 +80,11 @@ const handleLogin = () => {
 
   console.log('User name:', userName.value)
   console.log('Password:', password.value)
-  alert('Login successful!')
-  // Add your login logic here
+  
+  // Store the active username globally in localStorage so it persists!
+  localStorage.setItem('loggedInUser', userName.value);
+  
+  router.push('/screens')
 }
 </script>
 
@@ -90,12 +95,14 @@ const handleLogin = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  min-height: 100vh;
   gap: 10px;
-  width: 400px;
+  width: 100%;
 }
 
 .login-container {
-  width: 100%;
+  width: 400px;
   padding: 30px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -129,7 +136,7 @@ h1 {
 .sign-up-options {
   text-align: center;
   padding: 10px;
-  width: 100%;
+  width: 400px;
   border: 1px solid #ddd;
   border-radius: 8px;
   background-color: var(--background_color);

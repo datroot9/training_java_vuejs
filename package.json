@@ -13,7 +13,10 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@primevue/themes": "^4.5.4",
     "lucide-vue-next": "^0.577.0",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.5.4",
     "vue": "^3.5.29",
     "vue-router": "^5.0.4"
   },

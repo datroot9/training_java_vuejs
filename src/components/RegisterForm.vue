@@ -98,12 +98,14 @@ const handleBack = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  min-height: 100vh;
   gap: 10px;
-  width: 400px;
+  width: 100%;
 }
 
 .register-container {
-  width: 100%;
+  width: 400px;
   padding: 30px;
   border: 1px solid #ddd;
   border-radius: 8px;

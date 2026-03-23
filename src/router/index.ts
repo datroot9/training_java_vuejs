@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginForm from '@/components/LoginForm.vue'
 import RegisterForm from '@/components/RegisterForm.vue'
+import ScreenList from '@/components/ScreenList.vue'
 
 const router = createRouter({
   // Sử dụng HTML5 history mode để url sạch đẹp không có dấu #
@@ -19,6 +20,11 @@ const router = createRouter({
       path: '/register',
       name: 'register',
       component: RegisterForm
+    },
+    {
+      path: '/screens',
+      name: 'screens',
+      component: ScreenList
     }
   ]
 })
