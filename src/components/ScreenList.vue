@@ -22,7 +22,7 @@
           </div>
           <div class="search-actions">
             <Button @click="handleSearchStudent" label="Search" class="search-btn" unstyled/>
-            <Button label="Add Student"  class="add-btn" unstyled/>
+            <Button @click="router.push('/student/setup')" label="Add Student" class="add-btn" unstyled/>
           </div>
         </div>
 
@@ -60,7 +60,8 @@
           </Column>
           <Column header="Edit">
             <template #body="{ data }">
-              <a href="#" @click.prevent style="margin-right: 15px; color: #1a73e8; text-decoration: none;">edit</a>
+              <!-- Dynamically inject the specific student code into the router path to seamlessly trigger Setup Update mode! -->
+              <a href="#" @click.prevent="router.push(`/student/setup/${data.Code}`)" style="margin-right: 15px; color: #1a73e8; text-decoration: none;">edit</a>
               <a href="#" @click.prevent="handleDeleteStudent(data)" style="color: #ea4335; text-decoration: none;">delete</a>
             </template>
           </Column>
@@ -104,6 +105,7 @@ import InputText from 'primevue/inputtext';
 import Dialog from 'primevue/dialog';
 import type { Student } from '../types/student';
 import AppHeader from './AppHeader.vue';
+import { mockStudents } from '../data/mockStudents';
 
 const router = useRouter();
 const showErrorPopup = ref(false);
@@ -114,34 +116,8 @@ const searchName = ref('');
 const searchCode = ref('');
 const searchBirthday = ref('');
 
-// Mock data for the Data Table strictly bound to the new Student contract
-const users = ref<Student[]>([
-  { No: 1, Code: 'STU001', name: 'Alice Smith', Birthday: '2002-05-14', Address: '123 Maple St, NY', Score: 8.5 },
-  { No: 2, Code: 'STU002', name: 'Bob Jones', Birthday: '2001-11-20', Address: '456 Oak Dr, CA', Score: 7.2 },
-  { No: 3, Code: 'STU003', name: 'Charlie Brown', Birthday: '2003-03-10', Address: '789 Pine Ln, TX', Score: 9.1 },
-  { No: 4, Code: 'STU004', name: 'Diana Prince', Birthday: '2002-08-25', Address: '321 Elm St, FL', Score: 8.8 },
-  { No: 5, Code: 'STU005', name: 'Evan Peters', Birthday: '2001-12-05', Address: '654 Birch Rd, WA', Score: 6.9 },
-  { No: 6, Code: 'STU006', name: 'Fiona Gallagher', Birthday: '2003-07-19', Address: '987 Cedar Ct, PA', Score: 9.5 },
-  { No: 7, Code: 'STU007', name: 'George Lucas', Birthday: '2002-01-30', Address: '159 Walnut Ave, NV', Score: 8.0 },
-  { No: 8, Code: 'STU008', name: 'Hannah Abbott', Birthday: '2001-09-12', Address: '753 Ash Blvd, OR', Score: 7.8 },
-  { No: 9, Code: 'STU009', name: 'Ian Malcolm', Birthday: '2003-04-22', Address: '852 Spruce Way, UT', Score: 8.9 },
-  { No: 10, Code: 'STU010', name: 'Julia Roberts', Birthday: '2002-06-08', Address: '951 Pearl Sq, AZ', Score: 9.2 },
-  { No: 11, Code: 'STU011', name: 'Kevin Hart', Birthday: '2001-02-14', Address: '147 Diamond St, NY', Score: 6.4 },
-  { No: 12, Code: 'STU012', name: 'Liam Neeson', Birthday: '2003-10-05', Address: '258 Ruby Ln, TX', Score: 7.5 },
-  { No: 13, Code: 'STU013', name: 'Megan Fox', Birthday: '2002-12-25', Address: '369 Sapphire Blvd, CA', Score: 8.1 },
-  { No: 14, Code: 'STU014', name: 'Natalie Portman', Birthday: '2001-07-04', Address: '741 Emerald Ave, FL', Score: 9.8 },
-  { No: 15, Code: 'STU015', name: 'Oscar Isaac', Birthday: '2003-03-30', Address: '852 Topaz Dr, WA', Score: 7.0 },
-  { No: 16, Code: 'STU016', name: 'Penelope Cruz', Birthday: '2002-09-09', Address: '963 Opal Ct, OR', Score: 8.3 },
-  { No: 17, Code: 'STU017', name: 'Quentin Tarantino', Birthday: '2001-04-18', Address: '159 Pearl Way, NV', Score: 8.7 },
-  { No: 18, Code: 'STU018', name: 'Ryan Reynolds', Birthday: '2003-08-11', Address: '357 Onyx Sq, UT', Score: 6.8 },
-  { No: 19, Code: 'STU019', name: 'Scarlett Johansson', Birthday: '2002-01-21', Address: '486 Jade Rd, AZ', Score: 9.4 },
-  { No: 20, Code: 'STU020', name: 'Tom Hanks', Birthday: '2001-11-13', Address: '624 Quartz St, PA', Score: 7.9 },
-  { No: 21, Code: 'STU021', name: 'Uma Thurman', Birthday: '2003-06-06', Address: '815 Garnet Ln, NY', Score: 8.6 },
-  { No: 22, Code: 'STU022', name: 'Vin Diesel', Birthday: '2002-02-28', Address: '739 Amethyst Dr, TX', Score: 7.1 },
-  { No: 23, Code: 'STU023', name: 'Will Smith', Birthday: '2001-05-19', Address: '912 Sunstone Ave, CA', Score: 8.2 },
-  { No: 24, Code: 'STU024', name: 'Xavier Bardem', Birthday: '2003-12-12', Address: '468 Moonstone Blvd, FL', Score: 9.0 },
-  { No: 25, Code: 'STU025', name: 'Zendaya', Birthday: '2002-10-31', Address: '579 Zircon Ct, WA', Score: 9.7 },
-]);
+// Setup core data pipeline natively passing the generic external mock payload into our component state!
+const users = ref<Student[]>([...mockStudents]);
 
 // This active array houses the search results bound directly to your DataTable!
 const filteredUsers = ref<Student[]>([...users.value]);

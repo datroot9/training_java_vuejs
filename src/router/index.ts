@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LoginForm from '@/components/LoginForm.vue'
 import RegisterForm from '@/components/RegisterForm.vue'
 import ScreenList from '@/components/ScreenList.vue'
+import ScreenRegisterUpdate from '@/components/ScreenRegisterUpdate.vue'
 
 const router = createRouter({
   // Sử dụng HTML5 history mode để url sạch đẹp không có dấu #
@@ -25,6 +26,12 @@ const router = createRouter({
       path: '/screens',
       name: 'screens',
       component: ScreenList
+    },
+    {
+      // Utilizing an optional parameter (?) so this single route massively securely supports both Create (empty) and Update (Code provided) logic chains!
+      path: '/student/setup/:code?',
+      name: 'student-setup',
+      component: ScreenRegisterUpdate
     }
   ]
 })
