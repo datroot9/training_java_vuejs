@@ -2,16 +2,9 @@
   <div class="screen-list-wrapper">
     <main class="main-content">
       <div class="content-card">
-        <header class="header">
-          <div class="logo">
-            <img src="@/assets/logo.svg" alt="App Logo" width="40" height="40" />
-            <h2>My App</h2>
-          </div>
-          <div class="user-controls">
-            <span class="username">Welcome, {{ username }}</span>
-            <RouterLink to="/login" style="color: blue;">Logout</RouterLink>
-          </div>
-        </header> 
+        <!-- Modularized Header Component -->
+        <AppHeader />
+        
         <div class="Searching-student-groups">
           <div class="search-inputs">
             <div class="input-group">
@@ -110,6 +103,7 @@ import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import Dialog from 'primevue/dialog';
 import type { Student } from '../types/student';
+import AppHeader from './AppHeader.vue';
 
 const router = useRouter();
 const showErrorPopup = ref(false);
@@ -119,9 +113,6 @@ const errorMessage = ref(''); // Stores our dynamic validation rejections
 const searchName = ref('');
 const searchCode = ref('');
 const searchBirthday = ref('');
-
-// Dynamically pull the logged in user from local storage! (Fallback to Guest)
-const username = ref(localStorage.getItem('loggedInUser') || 'Guest User');
 
 // Mock data for the Data Table strictly bound to the new Student contract
 const users = ref<Student[]>([
@@ -243,51 +234,19 @@ const confirmDeleteStudent = () => {
   color: black;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 25px;
-  margin-bottom: 30px;
-  border-bottom: 2px solid #eef2f6;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.logo h2 {
-  margin: 0;
-  color: #333;
-  font-size: 1.4rem;
-}
-
-.user-controls {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.username {
-  font-weight: 500;
-  color: #555;
-  font-size: 1rem;
-}
-
 .Searching-student-groups {
   display: flex;
+  justify-content: center; /* Lock the groups cleanly to the horizontal center */
   align-items: stretch;
-  width: 100%;
-  gap: 20px;
-  margin-bottom: 30px;
+  gap: 40px; /* Expand the gap slightly since they are centrally packed */
+  margin-bottom: 25px;
 }
 
 .search-inputs {
   display: flex;
   flex-direction: column;
   gap: 15px;
+  width: 400px; /* Give the inputs a structured visual width instead of bleeding 100% space */
 }
 
 .input-group {
