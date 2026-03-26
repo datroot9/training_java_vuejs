@@ -79,7 +79,6 @@
         <Button label="Got it" @click="showErrorPopup = false" severity="secondary" autofocus />
       </div>
     </Dialog>
-
     <!-- Confirm Deletion Popup -->
     <Dialog v-model:visible="showDeletePopup" modal header="Confirm Deletion" :style="{ width: '25rem' }" :closable="false">
       <div style="padding: 10px 0 20px 0; color: #444; font-size: 1.05rem; display: flex; align-items: center;">

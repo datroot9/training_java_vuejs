@@ -20,8 +20,8 @@
           <div class="form-row">
             <label>Student Code :</label>
             <div class="input-wrapper code-wrapper">
-              <InputText v-model="student.Code" class="medium-input" />
-              <Button label="Generate Code" @click="generateCode" class="generate-btn" />
+              <InputText v-model="student.Code" class="medium-input" :disabled="isEditMode" />
+              <Button label="Generate Code" @click="generateCode" class="generate-btn" :disabled="isEditMode" />
             </div>
           </div>
 
@@ -70,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import AppHeader from './AppHeader.vue';
 import InputText from 'primevue/inputtext';
@@ -82,6 +82,8 @@ import type { Student } from '../types/student';
 // Establish Core System Hooks
 const route = useRoute();
 const router = useRouter();
+
+const isEditMode = computed(() => !!route.params.code);
 
 // Base Form Payload securely typed against our system Student interface!
 const student = ref<Student>({
