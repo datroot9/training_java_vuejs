@@ -26,22 +26,25 @@
     </div>
 
     <div class="sign-up-options">
-      <p>Don't have an account? <RouterLink to="/register">Register</RouterLink></p>
+      <p>
+        Don't have an account? <RouterLink to="/register">Register</RouterLink>
+      </p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { User as UserIcon, Lock as LockIcon } from 'lucide-vue-next'
-import CustomInput from './CustomInput.vue'
-import { useRouter } from 'vue-router'
-import { useValidation } from '@/composables/useValidation'
+import { ref, computed } from "vue";
+import { User as UserIcon, Lock as LockIcon } from "lucide-vue-next";
+import CustomInput from "./CustomInput.vue";
+import { useRouter } from "vue-router";
+import { useValidation } from "@/composables/useValidation";
 
-const userName = ref('')
-const password = ref('')
+const userName = ref("");
+const password = ref("");
 const isSubmitted = ref(false); // Cờ lưu trạng thái đã bấm nút Login
 const router = useRouter();
+const apiUrl = import.meta.env.VITE_API_URL; // Lấy URL API từ biến môi trường
 
 const { validateUserName, validatePassword } = useValidation();
 const userNameError = validateUserName(userName);
@@ -50,47 +53,64 @@ const passwordError = validatePassword(password);
 // Mảng cấu hình cho các input field dùng chung
 const formFields = computed(() => [
   {
-    id: 'user_name',
+    id: "user_name",
     value: userName.value,
-    update: (val: string) => userName.value = val,
-    type: 'text',
+    update: (val: string) => (userName.value = val),
+    type: "text",
     maxlength: 20,
-    placeholder: 'Email address',
+    placeholder: "Email address",
     error: userNameError.value,
-    icon: UserIcon
+    icon: UserIcon,
   },
   {
-    id: 'password',
+    id: "password",
     value: password.value,
-    update: (val: string) => password.value = val,
-    type: 'password',
+    update: (val: string) => (password.value = val),
+    type: "password",
     maxlength: 15,
-    placeholder: 'Enter your password',
+    placeholder: "Enter your password",
     error: passwordError.value,
-    icon: LockIcon
-  }
+    icon: LockIcon,
+  },
 ]);
 
 const handleLogin = () => {
   isSubmitted.value = true; // Bật cờ đã submit để hiển thị thông báo lỗi (nếu có)
-  
+
   if (userNameError.value || passwordError.value) {
     return; // Block không cho in ra console nếu đang có lỗi
   }
 
-  console.log('User name:', userName.value)
-  console.log('Password:', password.value)
-  
-  // Store the active username globally in localStorage so it persists!
-  localStorage.setItem('loggedInUser', userName.value);
-  
-  router.push('/screens')
-}
+  fetch(`${apiUrl}/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username: userName.value,
+      password: password.value,
+    }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log("Login successful:", data);
+      // Store the active username globally in localStorage so it persists!
+      localStorage.setItem("loggedInUser", userName.value);
+      router.push("/screens");
+    })
+    .catch((error) => {
+      console.error("Error during login:", error);
+      alert("Login failed. Please check your credentials and try again.");
+    });
+};
 </script>
 
 <style scoped>
-
-
 .login-wrapper {
   display: flex;
   flex-direction: column;
@@ -130,8 +150,6 @@ h1 {
   cursor: pointer;
   transition: background-color 0.3s;
 }
-
-
 
 .sign-up-options {
   text-align: center;

@@ -17,7 +17,9 @@
 
         <div class="button-group">
           <!-- Type button để chặn tự động Submit ngược -->
-          <button type="button" class="back-btn" @click="handleBack">Back</button>
+          <button type="button" class="back-btn" @click="handleBack">
+            Back
+          </button>
           <button type="submit" class="register-btn">Register</button>
         </div>
       </form>
@@ -26,74 +28,97 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import CustomInput from './CustomInput.vue'
-import { useRouter } from 'vue-router'  
-import { useValidation } from '@/composables/useValidation'
+import { ref, computed } from "vue";
+import CustomInput from "./CustomInput.vue";
+import { useRouter } from "vue-router";
+import { useValidation } from "@/composables/useValidation";
 
-const userName = ref('')
-const password = ref('')
-const confirmPassword = ref('')
-const href_login = ref('');
+const userName = ref("");
+const password = ref("");
+const confirmPassword = ref("");
+const href_login = ref("");
 const isSubmitted = ref(false);
 const router = useRouter();
 
-const { validateUserName, validatePassword, validateConfirmPassword } = useValidation();
+const { validateUserName, validatePassword, validateConfirmPassword } =
+  useValidation();
 const userNameError = validateUserName(userName);
 const passwordError = validatePassword(password);
 const confirmPasswordError = validateConfirmPassword(password, confirmPassword);
-
+const apiUrl = import.meta.env.VITE_API_URL;
 // Mảng cấu hình cho các input field dùng chung
 const formFields = computed(() => [
   {
-    id: 'user_name',
+    id: "user_name",
     value: userName.value,
-    update: (val: string) => userName.value = val,
-    type: 'text',
+    update: (val: string) => (userName.value = val),
+    type: "text",
     maxlength: 20,
-    placeholder: 'Email address',
-    error: userNameError.value
+    placeholder: "Email address",
+    error: userNameError.value,
   },
   {
-    id: 'password',
+    id: "password",
     value: password.value,
-    update: (val: string) => password.value = val,
-    type: 'password',
+    update: (val: string) => (password.value = val),
+    type: "password",
     maxlength: 15,
-    placeholder: 'Password',
-    error: passwordError.value
+    placeholder: "Password",
+    error: passwordError.value,
   },
   {
-    id: 'confirmPassword',
+    id: "confirmPassword",
     value: confirmPassword.value,
-    update: (val: string) => confirmPassword.value = val,
-    type: 'password',
+    update: (val: string) => (confirmPassword.value = val),
+    type: "password",
     maxlength: 15,
-    placeholder: 'Confirm password',
-    error: confirmPasswordError.value
-  }
+    placeholder: "Confirm password",
+    error: confirmPasswordError.value,
+  },
 ]);
 
-const handleRegister = () => {
+const handleRegister = async () => {
   isSubmitted.value = true;
-  if (userNameError.value || passwordError.value || confirmPasswordError.value) {
+  if (
+    userNameError.value ||
+    passwordError.value ||
+    confirmPasswordError.value
+  ) {
     return;
   }
-  console.log('User name:', userName.value)
-  console.log('Password:', password.value)
-  console.log('Confirm Password:', confirmPassword.value)
-  alert('Registration successful!')
-}
+
+  try {
+    const response = await fetch(`${apiUrl}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: userName.value,
+        password: password.value,
+        confirmPassword: confirmPassword.value,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("Registration successful!");
+      router.push("/login");
+    } else {
+      alert(data.message || "Registration failed");
+    }
+  } catch (error) {
+    console.error("Registration error:", error);
+    alert("An error occurred during registration");
+  }
+};
 
 const handleBack = () => {
-  console.log('Navigating back to Login...')
-  router.push('/login');
-}
+  console.log("Navigating back to Login...");
+  router.push("/login");
+};
 </script>
 
 <style scoped>
-
-
 .register-wrapper {
   display: flex;
   flex-direction: column;
