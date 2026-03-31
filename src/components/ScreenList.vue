@@ -62,12 +62,19 @@
           <template #paginatornextpagelinkicon unstyled>next</template>
           <template #paginatorlastpagelinkicon unstyled>last</template>
 
-          <Column field="id" header="No" sortable>
+          <Column sortField="id" header="No" sortable>
+            <template #body="slotProps">
+              {{ 
+                (currentPage - 1) * pageSize + 
+                (currentSortOrder === 'desc' 
+                  ? (students.length - slotProps.index) 
+                  : (slotProps.index + 1))
+              }}
+            </template>
             <template #sorticon="{ sortOrder }">
-              <span v-if="sortOrder === 1" style="font-size: 0.8rem">▲</span
-              ><span v-else-if="sortOrder === -1" style="font-size: 0.8rem"
-                >▼</span
-              ><span v-else style="font-size: 0.8rem; color: #aaa">▲</span>
+              <span v-if="sortOrder === 1" style="font-size: 0.8rem">▲</span>
+              <span v-else-if="sortOrder === -1" style="font-size: 0.8rem">▼</span>
+              <span v-else style="font-size: 0.8rem; color: #aaa">▲</span>
             </template>
           </Column>
           <Column field="code" header="Code" sortable>
@@ -108,7 +115,7 @@
               <!-- Dynamically inject the specific student code into the router path to seamlessly trigger Setup Update mode! -->
               <a
                 href="#"
-                @click.prevent="router.push(`/student/setup/${data.code}`)"
+                @click.prevent="router.push(`/student/setup/${data.id}`)"
                 style="
                   margin-right: 15px;
                   color: #1a73e8;
@@ -217,8 +224,10 @@ import Dialog from "primevue/dialog";
 import type { Student } from "../types/student";
 import AppHeader from "./AppHeader.vue";
 import { useStudents } from "../composables/useStudents";
+import { useToast } from "primevue/usetoast";
 
 const router = useRouter();
+const toast = useToast();
 const showErrorPopup = ref(false);
 const showDeletePopup = ref(false);
 const studentToDelete = ref<Student | null>(null); // Securely tracks the specific row data being targeted
@@ -237,6 +246,8 @@ const {
   isLoading,
   error,
   currentSearchParams,
+  currentSortBy,
+  currentSortOrder,
   fetchStudents,
   goToPage,
   deleteStudent,
@@ -321,10 +332,9 @@ const confirmDeleteStudent = async () => {
       // Smoothly hide the popup layer and natively deregister the payload mapping object
       showDeletePopup.value = false;
       studentToDelete.value = null;
-    } catch (err) {
-      errorMessage.value =
-        err instanceof Error ? err.message : "Failed to delete student";
-      showErrorPopup.value = true;
+      toast.add({ severity: 'success', summary: 'Success', detail: 'Student deleted successfully', life: 3000 });
+    } catch (err: any) {
+      toast.add({ severity: 'error', summary: 'Error', detail: err.message || "Failed to delete student", life: 5000 });
       showDeletePopup.value = false;
     }
   }

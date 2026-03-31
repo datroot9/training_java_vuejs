@@ -6,3 +6,5 @@ export interface Student {
   address: string;
   averageScore: number;
 }
+
+export type CreateStudent = Omit<Student, 'id'>;

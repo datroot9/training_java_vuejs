@@ -139,5 +139,6 @@ export function useStudents() {
     goToPage,
     deleteStudent,
     exportStudentsData,
+    // getStudentById,
   };
 }

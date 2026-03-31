@@ -76,14 +76,16 @@ import AppHeader from './AppHeader.vue';
 import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
 import Button from 'primevue/button';
-import { mockStudents } from '../data/mockStudents';
 import type { Student } from '../types/student';
+import { useToast } from 'primevue/usetoast';
+import { studentApi } from '../api/students';
 
 // Establish Core System Hooks
 const route = useRoute();
 const router = useRouter();
+const toast = useToast();
 
-const isEditMode = computed(() => !!route.params.code);
+const isEditMode = computed(() => !!route.params.id);
 
 // Base Form Payload securely typed against our system Student interface!
 const student = ref<Student>({
@@ -95,20 +97,27 @@ const student = ref<Student>({
   averageScore: 0
 });
 
-onMounted(() => {
+onMounted(async () => {
   // Automatically identify if we are executing "Update" mode naturally by intercepting the unique Route ID parameter!
-  const targetCode = route.params.code;
+  const targetId = route.params.id;
   
-  if (targetCode) {
-    // Array scan perfectly mapping the internal URL dynamically into our newly extracted Mock Database block
-    const existingStudent = mockStudents.find((s: Student) => s.code === targetCode);
-    
-    if (existingStudent) {
-      console.log('Existing student data physically located. Injecting payload straight into form inputs!');
-      // Safely clone the target student object entirely directly into our raw reactive Form state!
-      student.value = { ...existingStudent };
-    } else {
-      console.error('Target student database code not mapped correctly inside the Mock data!');
+  if (targetId) {
+    try {
+      console.log('Fetching student details from API...');
+      const existingStudent = await studentApi.getStudentById(Number(targetId));
+      
+      if (existingStudent) {
+        console.log('Student data received. Injecting payload into form inputs!');
+        // Safely clone the target student object and format the birthday to yyyy-MM-dd for the HTML5 date input
+        student.value = { 
+          ...existingStudent,
+          birthday: existingStudent.birthday ? existingStudent.birthday.replace(/\//g, '-') : ''
+        };
+      }
+    } catch (err: any) {
+      console.error('Failed to fetch student:', err);
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Could not load student details', life: 5000 });
+      router.push('/screens');
     }
   }
 });
@@ -122,26 +131,41 @@ const handleBack = () => {
   router.push('/screens');
 };
 
-const handleSave = () => {
+const handleSave = async () => {
   console.log('Securely Saving Student Structure payload:', student.value);
-  const targetCode = route.params.code;
-  
-  if (targetCode) {
-    // Find and update existing student
-    const index = mockStudents.findIndex((s: Student) => s.code === targetCode);
-    if (index !== -1) {
-      mockStudents[index] = { ...student.value };
-    }
-  } else {
-    // Create new student
-    student.value.id = Math.max(0, ...mockStudents.map(s => s.id)) + 1;
-    if (!student.value.code) {
-      generateCode();
-    }
-    mockStudents.push({ ...student.value });
-  }
+  const targetId = route.params.id;
 
-  router.push('/screens');
+  // Prepare payload
+  const { id, ...createPayload } = student.value;
+  if (!createPayload.code) {
+    createPayload.code = 'STU' + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+  }
+  
+  // The backend strictly validates birthday format as yyyy/MM/dd
+  if (createPayload.birthday) {
+    createPayload.birthday = createPayload.birthday.replace(/-/g, '/');
+  }
+  
+  try {
+    if (targetId) {
+      // Update existing student via API
+      await studentApi.updateStudent(Number(targetId), createPayload);
+      toast.add({ severity: 'success', summary: 'Success', detail: 'Student updated successfully', life: 3000 });
+    } else {
+      // Create new student via API
+      await studentApi.addStudent(createPayload);
+      toast.add({ severity: 'success', summary: 'Success', detail: 'Student created successfully', life: 3000 });
+    }
+    router.push('/screens');
+  } catch (err: any) {
+    const action = targetId ? 'update' : 'create';
+    toast.add({ 
+      severity: 'error', 
+      summary: 'Error', 
+      detail: err.message || `Failed to ${action} student`, 
+      life: 5000 
+    });
+  }
 };
 </script>
 

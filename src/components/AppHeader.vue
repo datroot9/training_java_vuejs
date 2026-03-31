@@ -2,7 +2,7 @@
   <header class="header">
     <div class="logo">
       <img src="@/assets/logo.svg" alt="App Logo" width="40" height="40" />
-      <h2>My App</h2>
+      <h2>Student Management</h2>
     </div>
     <div class="user-controls">
       <span class="username">Welcome, {{ username }}</span>

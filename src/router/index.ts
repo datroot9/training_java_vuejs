@@ -28,8 +28,8 @@ const router = createRouter({
       component: ScreenList
     },
     {
-      // Utilizing an optional parameter (?) so this single route massively securely supports both Create (empty) and Update (Code provided) logic chains!
-      path: '/student/setup/:code?',
+      // Utilizing an optional parameter (?) so this single route massively securely supports both Create (empty) and Update (ID provided) logic chains!
+      path: '/student/setup/:id?',
       name: 'student-setup',
       component: ScreenRegisterUpdate
     }
