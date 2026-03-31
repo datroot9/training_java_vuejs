@@ -62,7 +62,7 @@
         <!-- Submit Bounds -->
         <div class="form-actions">
           <Button label="Back" @click="handleBack" class="action-btn px-5" />
-          <Button label="Save" @click="handleSave" class="action-btn px-5" />
+          <Button label="Save" @click="handleSave" class="action-btn px-5" :loading="isLoading" />
         </div>
       </div>
     </main>
@@ -78,12 +78,13 @@ import InputNumber from 'primevue/inputnumber';
 import Button from 'primevue/button';
 import type { Student } from '../types/student';
 import { useToast } from 'primevue/usetoast';
-import { studentApi } from '../api/students';
+import { useStudents } from '../composables/useStudents';
 
 // Establish Core System Hooks
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
+const { getStudentById, addStudent, updateStudent, isLoading } = useStudents();
 
 const isEditMode = computed(() => !!route.params.id);
 
@@ -103,8 +104,7 @@ onMounted(async () => {
   
   if (targetId) {
     try {
-      console.log('Fetching student details from API...');
-      const existingStudent = await studentApi.getStudentById(Number(targetId));
+      const existingStudent = await getStudentById(Number(targetId));
       
       if (existingStudent) {
         console.log('Student data received. Injecting payload into form inputs!');
@@ -115,7 +115,6 @@ onMounted(async () => {
         };
       }
     } catch (err: any) {
-      console.error('Failed to fetch student:', err);
       toast.add({ severity: 'error', summary: 'Error', detail: 'Could not load student details', life: 5000 });
       router.push('/screens');
     }
@@ -149,11 +148,11 @@ const handleSave = async () => {
   try {
     if (targetId) {
       // Update existing student via API
-      await studentApi.updateStudent(Number(targetId), createPayload);
+      await updateStudent(Number(targetId), createPayload);
       toast.add({ severity: 'success', summary: 'Success', detail: 'Student updated successfully', life: 3000 });
     } else {
       // Create new student via API
-      await studentApi.addStudent(createPayload);
+      await addStudent(createPayload);
       toast.add({ severity: 'success', summary: 'Success', detail: 'Student created successfully', life: 3000 });
     }
     router.push('/screens');
