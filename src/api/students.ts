@@ -77,4 +77,42 @@ export const studentApi = {
 
     console.log("✅ Student deleted successfully");
   },
+
+  /**
+   * Export students data to manually managed CSV attachment
+   */
+  async exportStudents(): Promise<void> {
+    console.log(`📡 Calling: GET ${API_BASE_URL}/students/export`);
+
+    const response = await fetch(`${API_BASE_URL}/students/export`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to export students: ${response.statusText}`);
+    }
+
+    // Attempt to grab the perfectly generated Spring resource filename
+    const contentDisposition = response.headers.get('Content-Disposition');
+    let filename = 'students_export.csv';
+    if (contentDisposition && contentDisposition.includes('filename=')) {
+      const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+      if (filenameMatch && filenameMatch.length >= 2) {
+        filename = filenameMatch[1] || 'students_export.csv';
+      }
+    }
+
+    // Convert API payload safely to native browser blob and trigger visual download
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    
+    // Non-intrusively load into Document structure, dynamically trigger, and completely garbage collect!
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+
+    console.log("✅ Students successfully generated and exported!");
+  },
 };

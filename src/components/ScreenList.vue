@@ -37,6 +37,12 @@
               class="add-btn"
               unstyled
             />
+            <Button
+              @click="handleExport"
+              label="Export"
+              class="export-btn"
+              unstyled
+            />
           </div>
         </div>
 
@@ -234,6 +240,7 @@ const {
   fetchStudents,
   goToPage,
   deleteStudent,
+  exportStudentsData,
 } = useStudents();
 
 // Load initial student data when component mounts
@@ -320,6 +327,17 @@ const confirmDeleteStudent = async () => {
       showErrorPopup.value = true;
       showDeletePopup.value = false;
     }
+  }
+};
+
+const handleExport = async () => {
+  try {
+    // Await natively managed blob transmission completely without user redirects
+    await exportStudentsData();
+  } catch (err) {
+    errorMessage.value =
+      err instanceof Error ? err.message : "Failed to export CSV output from server";
+    showErrorPopup.value = true;
   }
 };
 

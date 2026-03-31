@@ -102,6 +102,25 @@ export function useStudents() {
     }
   };
 
+  /**
+   * Export all currently mapped students into native standard CSV output
+   */
+  const exportStudentsData = async () => {
+    try {
+      isLoading.value = true;
+      error.value = null;
+      await studentApi.exportStudents();
+      console.log("✅ Student baseline CSV payload exported seamlessly");
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Failed to export CSV output payload";
+      error.value = errorMsg;
+      console.error("❌ Local Export error block:", errorMsg);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
   return {
     // State
     students,
@@ -119,5 +138,6 @@ export function useStudents() {
     fetchStudents,
     goToPage,
     deleteStudent,
+    exportStudentsData,
   };
 }
