@@ -44,7 +44,7 @@ router.beforeEach((to, from, next) => {
   if (isLoggedIn && (to.path === '/login' || to.path === '/register' || to.path === '/')) {
     // Prevent authenticated users from visiting the login or register pages natively
     next('/screens');
-  } else if (!isLoggedIn && to.path === '/screens') {
+  } else if (!isLoggedIn && (to.path === '/screens' || to.name === 'student-setup')) {
     // Block unauthenticated guests from bypassing the login page directly into the dashboard!
     next('/login');
   } else {

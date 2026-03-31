@@ -33,10 +33,11 @@ import CustomInput from "./CustomInput.vue";
 import { useRouter } from "vue-router";
 import { useValidation } from "@/composables/useValidation";
 
+import { authApi } from "@/api/auth";
+
 const userName = ref("");
 const password = ref("");
 const confirmPassword = ref("");
-const href_login = ref("");
 const isSubmitted = ref(false);
 const router = useRouter();
 
@@ -45,7 +46,7 @@ const { validateUserName, validatePassword, validateConfirmPassword } =
 const userNameError = validateUserName(userName);
 const passwordError = validatePassword(password);
 const confirmPasswordError = validateConfirmPassword(password, confirmPassword);
-const apiUrl = import.meta.env.VITE_API_URL;
+
 // Mảng cấu hình cho các input field dùng chung
 const formFields = computed(() => [
   {
@@ -88,27 +89,18 @@ const handleRegister = async () => {
   }
 
   try {
-    const response = await fetch(`${apiUrl}/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: userName.value,
-        password: password.value,
-        confirmPassword: confirmPassword.value,
-      }),
+    const result = await authApi.register({
+      username: userName.value,
+      password: password.value,
+      confirmPassword: confirmPassword.value,
     });
 
-    const data = await response.json();
-
-    if (response.ok) {
-      alert("Registration successful!");
-      router.push("/login");
-    } else {
-      alert(data.message || "Registration failed");
-    }
-  } catch (error) {
+    console.log("Registration successful:", result);
+    alert("Registration successful!");
+    router.push("/login");
+  } catch (error: any) {
     console.error("Registration error:", error);
-    alert("An error occurred during registration");
+    alert(error.message || "An error occurred during registration");
   }
 };
 

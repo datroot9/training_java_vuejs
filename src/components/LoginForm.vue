@@ -40,11 +40,13 @@ import CustomInput from "./CustomInput.vue";
 import { useRouter } from "vue-router";
 import { useValidation } from "@/composables/useValidation";
 
+import { authApi } from "@/api/auth";
+
 const userName = ref("");
 const password = ref("");
 const isSubmitted = ref(false); // Cờ lưu trạng thái đã bấm nút Login
+const isLoading = ref(false);
 const router = useRouter();
-const apiUrl = import.meta.env.VITE_API_URL; // Lấy URL API từ biến môi trường
 
 const { validateUserName, validatePassword } = useValidation();
 const userNameError = validateUserName(userName);
@@ -74,39 +76,30 @@ const formFields = computed(() => [
   },
 ]);
 
-const handleLogin = () => {
+const handleLogin = async () => {
   isSubmitted.value = true; // Bật cờ đã submit để hiển thị thông báo lỗi (nếu có)
 
   if (userNameError.value || passwordError.value) {
     return; // Block không cho in ra console nếu đang có lỗi
   }
 
-  fetch(`${apiUrl}/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
+  isLoading.value = true;
+  try {
+    const data = await authApi.login({
       username: userName.value,
       password: password.value,
-    }),
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Login failed");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      console.log("Login successful:", data);
-      // Store the active username globally in localStorage so it persists!
-      localStorage.setItem("loggedInUser", userName.value);
-      router.push("/screens");
-    })
-    .catch((error) => {
-      console.error("Error during login:", error);
-      alert("Login failed. Please check your credentials and try again.");
     });
+
+    console.log("Login successful:", data);
+    // Store the active username globally in localStorage so it persists!
+    localStorage.setItem("loggedInUser", userName.value);
+    router.push("/screens");
+  } catch (error: any) {
+    console.error("Error during login:", error);
+    alert(error.message || "Login failed. Please check your credentials and try again.");
+  } finally {
+    isLoading.value = false;
+  }
 };
 </script>
 
