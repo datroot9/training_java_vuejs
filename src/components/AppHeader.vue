@@ -1,7 +1,7 @@
 <template>
   <header class="header">
     <div class="logo">
-      <img src="@/assets/logo.svg" alt="App Logo" width="40" height="40" />
+      <img src="@/assets/SMS.png" alt="App Logo" width="40" height="40" />
       <h2>Student Management</h2>
     </div>
     <div class="user-controls">
