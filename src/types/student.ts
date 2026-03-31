@@ -1,8 +1,8 @@
 export interface Student {
-  No: number;
-  Code: string;
+  id: number;
+  code: string;
   name: string;
-  Birthday: string;
-  Address: string;
-  Score: number;
+  birthday: string;
+  address: string;
+  averageScore: number;
 }

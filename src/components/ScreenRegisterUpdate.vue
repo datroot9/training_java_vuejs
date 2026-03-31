@@ -12,7 +12,7 @@
             <label>Student Id :</label>
             <div class="input-wrapper">
               <!-- Replaced loose text input with strict native Integer validation -->
-              <InputNumber v-model="student.No" inputId="withoutgrouping" :useGrouping="false" class="short-input" disabled/>
+              <InputNumber v-model="student.id" inputId="withoutgrouping" :useGrouping="false" class="short-input" disabled/>
             </div>
           </div>
           
@@ -20,7 +20,7 @@
           <div class="form-row">
             <label>Student Code :</label>
             <div class="input-wrapper code-wrapper">
-              <InputText v-model="student.Code" class="medium-input" :disabled="isEditMode" />
+              <InputText v-model="student.code" class="medium-input" :disabled="isEditMode" />
               <Button label="Generate Code" @click="generateCode" class="generate-btn" :disabled="isEditMode" />
             </div>
           </div>
@@ -37,7 +37,7 @@
           <div class="form-row">
             <label>Birthday :</label>
             <div class="input-wrapper">
-              <InputText type="date" v-model="student.Birthday" class="medium-input date-input" />
+              <InputText type="date" v-model="student.birthday" class="medium-input date-input" />
             </div>
           </div>
 
@@ -45,7 +45,7 @@
           <div class="form-row">
             <label>Address :</label>
             <div class="input-wrapper" style="width: 100%;">
-              <InputText v-model="student.Address" class="long-input" />
+              <InputText v-model="student.address" class="long-input" />
             </div>
           </div>
 
@@ -54,7 +54,7 @@
             <label>Average Score :</label>
             <div class="input-wrapper">
               <!-- Replaced loose text input with strict architectural Decimal constraint block -->
-              <InputNumber v-model="student.Score" :minFractionDigits="0" :maxFractionDigits="2" class="short-input" />
+              <InputNumber v-model="student.averageScore" :minFractionDigits="0" :maxFractionDigits="2" class="short-input" />
             </div>
           </div>
         </div>
@@ -87,12 +87,12 @@ const isEditMode = computed(() => !!route.params.code);
 
 // Base Form Payload securely typed against our system Student interface!
 const student = ref<Student>({
-  No: 0,
-  Code: '',
+  id: 0,
+  code: '',
   name: '',
-  Birthday: '',
-  Address: '',
-  Score: 0
+  birthday: '',
+  address: '',
+  averageScore: 0
 });
 
 onMounted(() => {
@@ -101,7 +101,7 @@ onMounted(() => {
   
   if (targetCode) {
     // Array scan perfectly mapping the internal URL dynamically into our newly extracted Mock Database block
-    const existingStudent = mockStudents.find((s: Student) => s.Code === targetCode);
+    const existingStudent = mockStudents.find((s: Student) => s.code === targetCode);
     
     if (existingStudent) {
       console.log('Existing student data physically located. Injecting payload straight into form inputs!');
@@ -115,7 +115,7 @@ onMounted(() => {
 
 const generateCode = () => {
   // Dynamically assemble a uniquely generated structural Code parameter for new Add entries.
-  student.value.Code = 'STU' + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+  student.value.code = 'STU' + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
 };
 
 const handleBack = () => {
@@ -128,14 +128,14 @@ const handleSave = () => {
   
   if (targetCode) {
     // Find and update existing student
-    const index = mockStudents.findIndex((s: Student) => s.Code === targetCode);
+    const index = mockStudents.findIndex((s: Student) => s.code === targetCode);
     if (index !== -1) {
       mockStudents[index] = { ...student.value };
     }
   } else {
     // Create new student
-    student.value.No = Math.max(0, ...mockStudents.map(s => s.No)) + 1;
-    if (!student.value.Code) {
+    student.value.id = Math.max(0, ...mockStudents.map(s => s.id)) + 1;
+    if (!student.value.code) {
       generateCode();
     }
     mockStudents.push({ ...student.value });
