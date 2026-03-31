@@ -1,31 +1,26 @@
 <template>
-  <div class="screen-setup-wrapper">
-    <main class="main-content">
-      <div class="content-card">
-        <AppHeader />
-        
-        <h2 class="page-title">STUDENT</h2>
-        
-        <StudentForm
-          v-model="student"
-          :is-edit-mode="isEditMode"
-          :loading="isLoading"
-          @back="handleBack"
-          @save="handleSave"
-        />
-      </div>
-    </main>
-  </div>
+  <MainLayout>
+    <h2 class="page-title">STUDENT</h2>
+    
+    <StudentForm
+      v-model="student"
+      :is-edit-mode="isEditMode"
+      :loading="isLoading"
+      @back="handleBack"
+      @save="handleSave"
+    />
+  </MainLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import AppHeader from './AppHeader.vue';
+import MainLayout from '../layouts/MainLayout.vue';
 import StudentForm from './StudentForm.vue';
 import type { Student } from '../types/student';
 import { useToast } from 'primevue/usetoast';
 import { useStudents } from '../composables/useStudents';
+import { toBrowserDate, toBackendDate } from '../utils/date';
 
 const route = useRoute();
 const router = useRouter();
@@ -51,7 +46,7 @@ onMounted(async () => {
       if (existingStudent) {
         student.value = { 
           ...existingStudent,
-          birthday: existingStudent.birthday ? existingStudent.birthday.replace(/\//g, '-') : ''
+          birthday: toBrowserDate(existingStudent.birthday)
         };
       }
     } catch (err: any) {
@@ -67,11 +62,9 @@ const handleBack = () => {
 
 const handleSave = async () => {
   const targetId = route.params.id;
-  const { id, ...createPayload } = student.value;
+  const { id, ...createPayload } = { ...student.value };
 
-  if (createPayload.birthday) {
-    createPayload.birthday = createPayload.birthday.replace(/-/g, '/');
-  }
+  createPayload.birthday = toBackendDate(createPayload.birthday);
   
   try {
     if (targetId) {
@@ -90,33 +83,6 @@ const handleSave = async () => {
 </script>
 
 <style scoped>
-.screen-setup-wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background-color: #ffffff;
-  color: black;
-}
-
-.main-content {
-  flex: 1;
-  padding: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-}
-
-.content-card {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-  width: 100%;
-  max-width: 1200px;
-  display: flex;
-  flex-direction: column;
-}
-
 .page-title {
   text-align: center;
   font-size: 1.5rem;

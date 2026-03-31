@@ -76,6 +76,8 @@ const formFields = computed(() => [
   },
 ]);
 
+import { AUTH_USER_KEY } from "@/utils/constants";
+
 const handleLogin = async () => {
   isSubmitted.value = true; // Bật cờ đã submit để hiển thị thông báo lỗi (nếu có)
 
@@ -92,7 +94,7 @@ const handleLogin = async () => {
 
     console.log("Login successful:", data);
     // Store the active username globally in localStorage so it persists!
-    localStorage.setItem("loggedInUser", userName.value);
+    localStorage.setItem(AUTH_USER_KEY, userName.value);
     router.push("/screens");
   } catch (error: any) {
     console.error("Error during login:", error);

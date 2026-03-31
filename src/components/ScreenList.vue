@@ -1,35 +1,28 @@
 <template>
-  <div class="screen-list-wrapper">
-    <main class="main-content">
-      <div class="content-card">
-        <!-- Modularized Header Component -->
-        <AppHeader />
+  <MainLayout>
+    <!-- Modularized Search Form -->
+    <StudentSearch
+      v-model:name="searchName"
+      v-model:code="searchCode"
+      v-model:birthday="searchBirthday"
+      @search="handleSearchStudent"
+      @add="router.push('/student/setup')"
+      @export="handleExport"
+    />
 
-        <!-- Modularized Search Form -->
-        <StudentSearch
-          v-model:name="searchName"
-          v-model:code="searchCode"
-          v-model:birthday="searchBirthday"
-          @search="handleSearchStudent"
-          @add="router.push('/student/setup')"
-          @export="handleExport"
-        />
-
-        <!-- Modularized Student Table -->
-        <StudentTable
-          :students="students"
-          :loading="isLoading"
-          :total-count="totalCount"
-          :page-size="pageSize"
-          :current-page="currentPage"
-          :sort-order="currentSortOrder"
-          @page="updatePage"
-          @sort="onSort"
-          @edit="(student) => router.push(`/student/setup/${student.id}`)"
-          @delete="handleDeleteStudent"
-        />
-      </div>
-    </main>
+    <!-- Modularized Student Table -->
+    <StudentTable
+      :students="students"
+      :loading="isLoading"
+      :total-count="totalCount"
+      :page-size="pageSize"
+      :current-page="currentPage"
+      :sort-order="currentSortOrder"
+      @page="updatePage"
+      @sort="onSort"
+      @edit="(student) => router.push(`/student/setup/${student.id}`)"
+      @delete="handleDeleteStudent"
+    />
 
     <!-- Beautiful Error Popup -->
     <Dialog
@@ -71,7 +64,7 @@
       @cancel="showDeletePopup = false"
       @confirm="confirmDeleteStudent"
     />
-  </div>
+  </MainLayout>
 </template>
 
 <script setup lang="ts">
@@ -80,7 +73,7 @@ import { useRouter } from "vue-router";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
 import type { Student } from "../types/student";
-import AppHeader from "./AppHeader.vue";
+import MainLayout from "../layouts/MainLayout.vue";
 import StudentSearch from "./StudentSearch.vue";
 import StudentTable from "./StudentTable.vue";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog.vue";
@@ -177,32 +170,5 @@ const onSort = (event: any) => {
 </script>
 
 <style scoped>
-.screen-list-wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  width: 100vw;
-  background-color: #ffffff;
-  font-family: Inter, Roboto, sans-serif;
-  color: black;
-}
-
-.main-content {
-  flex: 1;
-  padding: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-}
-
-.content-card {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-  width: 100%;
-  max-width: 1200px;
-  display: flex;
-  flex-direction: column;
-}
+/* Redundant screen styles removed in favor of MainLayout */
 </style>

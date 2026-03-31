@@ -1,14 +1,8 @@
-/**
- * Composable for managing student data and API calls
- * Handles loading state, pagination, errors, etc.
- */
-
 import { ref } from "vue";
 import type { Student, CreateStudent } from "../types/student";
 import { studentApi } from "../api/students";
 
 export function useStudents() {
-  // State variables
   const students = ref<Student[]>([]);
   const totalCount = ref(0);
   const totalPages = ref(0);
@@ -17,14 +11,10 @@ export function useStudents() {
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
-  // Active query parameters persisted for pagination and refresh
   const currentSearchParams = ref<{ name?: string; code?: string; birthday?: string }>({});
   const currentSortBy = ref<string | undefined>(undefined);
   const currentSortOrder = ref<"asc" | "desc" | undefined>(undefined);
 
-  /**
-   * Main function to fetch students from API
-   */
   const fetchStudents = async (
     page: number = 1,
     pageSize_: number = 10,
@@ -36,8 +26,6 @@ export function useStudents() {
     error.value = null;
 
     try {
-      console.log(`🔄 Fetching page ${page} with pageSize ${pageSize_}...`);
-
       const response = await studentApi.getStudents(
         page, 
         pageSize_, 
@@ -46,31 +34,22 @@ export function useStudents() {
         sortOrder
       );
 
-      // Update all reactive state
       students.value = response.data;
       totalCount.value = response.totalCount;
       totalPages.value = response.totalPages;
       currentPage.value = response.currentPage;
       pageSize.value = response.pageSize;
       
-      // Persist the latest query parameters for subsequent calls like goToPage
       if (searchParams !== undefined) currentSearchParams.value = searchParams;
       if (sortBy !== undefined) currentSortBy.value = sortBy;
       if (sortOrder !== undefined) currentSortOrder.value = sortOrder;
-
-      console.log(`✅ Loaded ${students.value.length} students`);
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Unknown error";
-      error.value = errorMsg;
-      console.error("❌ Error:", errorMsg);
+    } catch (err: any) {
+      error.value = err.message || "Failed to load students";
     } finally {
       isLoading.value = false;
     }
   };
 
-  /**
-   * Navigate to a specific page
-   */
   const goToPage = (page: number) => {
     return fetchStudents(
       page, 
@@ -81,98 +60,65 @@ export function useStudents() {
     );
   };
 
-  /**
-   * Fetch a single student by ID
-   */
   const getStudentById = async (id: number): Promise<Student | null> => {
     isLoading.value = true;
     error.value = null;
     try {
-      const student = await studentApi.getStudentById(id);
-      console.log("✅ Student details loaded");
-      return student;
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Failed to load student details";
-      error.value = errorMsg;
-      console.error("❌ Fetch error:", errorMsg);
+      return await studentApi.getStudentById(id);
+    } catch (err: any) {
+      error.value = err.message || "Failed to load student details";
       throw err;
     } finally {
       isLoading.value = false;
     }
   };
 
-  /**
-   * Create a new student profile
-   */
   const addStudent = async (student: CreateStudent): Promise<void> => {
     isLoading.value = true;
     error.value = null;
     try {
       await studentApi.addStudent(student);
-      console.log("✅ Student successfully created");
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Failed to create student";
-      error.value = errorMsg;
-      console.error("❌ Create error:", errorMsg);
+    } catch (err: any) {
+      error.value = err.message || "Failed to create student";
       throw err;
     } finally {
       isLoading.value = false;
     }
   };
 
-  /**
-   * Update an existing student profile
-   */
   const updateStudent = async (id: number, student: CreateStudent): Promise<void> => {
     isLoading.value = true;
     error.value = null;
     try {
       await studentApi.updateStudent(id, student);
-      console.log("✅ Student successfully updated");
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Failed to update student";
-      error.value = errorMsg;
-      console.error("❌ Update error:", errorMsg);
+    } catch (err: any) {
+      error.value = err.message || "Failed to update student";
       throw err;
     } finally {
       isLoading.value = false;
     }
   };
 
-  /**
-   * Delete a student and reload data
-   */
   const deleteStudent = async (studentId: number) => {
     try {
       isLoading.value = true;
       await studentApi.deleteStudent(studentId);
-
-      // Reload current page
       await fetchStudents(currentPage.value, pageSize.value);
-      console.log("✅ Student deleted and data reloaded");
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Failed to delete";
-      error.value = errorMsg;
-      console.error("❌ Delete error:", errorMsg);
+    } catch (err: any) {
+      error.value = err.message || "Failed to delete student";
       throw err;
     } finally {
       isLoading.value = false;
     }
   };
 
-  /**
-   * Export all currently mapped students into native standard CSV output
-   */
   const exportStudentsData = async () => {
     try {
       isLoading.value = true;
       error.value = null;
       await studentApi.exportStudents();
-      console.log("✅ Student baseline CSV payload exported seamlessly");
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Failed to export CSV output payload";
-      error.value = errorMsg;
-      console.error("❌ Local Export error block:", errorMsg);
+    } catch (err: any) {
+      error.value = err.message || "Failed to export CSV data";
       throw err;
     } finally {
       isLoading.value = false;
@@ -180,7 +126,6 @@ export function useStudents() {
   };
 
   return {
-    // State
     students,
     totalCount,
     totalPages,
@@ -191,8 +136,6 @@ export function useStudents() {
     currentSearchParams,
     currentSortBy,
     currentSortOrder,
-
-    // Methods
     fetchStudents,
     goToPage,
     getStudentById,
@@ -200,5 +143,14 @@ export function useStudents() {
     updateStudent,
     deleteStudent,
     exportStudentsData,
+    isCodeAvailable: async (code: string): Promise<boolean> => {
+      try {
+        const student = await studentApi.getStudentByCode(code);
+        return !student; // If we get a student back, the code is NOT available
+      } catch (err) {
+        // If it throws an error (like 404), the code is available
+        return true;
+      }
+    }
   };
 }

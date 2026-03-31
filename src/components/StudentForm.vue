@@ -4,16 +4,31 @@
     <div class="form-row">
       <label>Student Id :</label>
       <div class="input-wrapper">
-        <InputNumber v-model="student.id" inputId="withoutgrouping" :useGrouping="false" class="short-input" disabled/>
+        <InputNumber v-model="student.id" inputId="withoutgrouping" :useGrouping="false" class="short-input" disabled />
       </div>
     </div>
-    
+
     <!-- Student Code -->
     <div class="form-row">
       <label>Student Code :</label>
-      <div class="input-wrapper code-wrapper">
-        <InputText v-model="student.code" class="medium-input" :disabled="isEditMode" />
-        <Button label="Generate Code" @click="generateCode" class="generate-btn" :disabled="isEditMode" />
+      <div class="input-wrapper">
+        <div class="flex-column">
+          <div class="code-wrapper">
+            <InputText 
+              v-model="student.code" 
+              :class="['medium-input', { 'p-invalid': codeError }]" 
+              disabled
+            />
+            <Button 
+              label="Generate Code" 
+              @click="generateCode" 
+              class="generate-btn" 
+              :disabled="isEditMode" 
+            />
+          </div>
+          <small v-if="codeError" class="error-text">{{ codeError }}</small>
+          <small v-else-if="isCheckingCode" class="checking-text">Checking availability...</small>
+        </div>
       </div>
     </div>
 
@@ -53,27 +68,69 @@
   <!-- Submit Bounds -->
   <div class="form-actions">
     <Button label="Back" @click="$emit('back')" class="action-btn px-5" />
-    <Button label="Save" @click="$emit('save')" class="action-btn px-5" :loading="loading" />
+    <Button 
+      label="Save" 
+      @click="handleSave" 
+      class="action-btn px-5" 
+      :loading="loading" 
+      :disabled="!!codeError || isCheckingCode"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, watch } from 'vue';
 import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
 import Button from 'primevue/button';
 import type { Student } from '../types/student';
+import { useStudents } from '../composables/useStudents';
 
 const student = defineModel<Student>({ required: true });
 
-defineProps<{
+const props = defineProps<{
   isEditMode: boolean;
   loading: boolean;
 }>();
 
 const emit = defineEmits(['save', 'back']);
+const { isCodeAvailable } = useStudents();
+
+const codeError = ref('');
+const isCheckingCode = ref(false);
+let debounceTimer: any = null;
+
+// Watch for code changes to prevent duplicates in Real-Time!
+watch(() => student.value.code, (newCode) => {
+  if (props.isEditMode || !newCode) {
+    codeError.value = '';
+    return;
+  }
+
+  isCheckingCode.value = true;
+  codeError.value = '';
+
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(async () => {
+    try {
+      const available = await isCodeAvailable(newCode);
+      if (!available) {
+        codeError.value = 'This student code already exists!';
+      }
+    } finally {
+      isCheckingCode.value = false;
+    }
+  }, 500); // 500ms debounce to prevent API flooding
+});
 
 const generateCode = () => {
   student.value.code = 'STU' + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+};
+
+const handleSave = () => {
+  if (!codeError.value && !isCheckingCode.value) {
+    emit('save');
+  }
 };
 </script>
 
@@ -107,6 +164,26 @@ const generateCode = () => {
 
 .code-wrapper {
   gap: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.error-text {
+  color: #ef4444; /* PrimeVue tailwind red-500 */
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+
+.checking-text {
+  color: #64748b; /* Gray-500 */
+  font-size: 0.85rem;
+  font-style: italic;
 }
 
 .short-input {

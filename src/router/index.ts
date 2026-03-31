@@ -36,10 +36,12 @@ const router = createRouter({
   ]
 })
 
+import { AUTH_USER_KEY } from '@/utils/constants'
+
 // Configure Global Route Guards to securely handle authenticated session redirects
 router.beforeEach((to, from, next) => {
   // Check if our user token exists dynamically in browser memory
-  const isLoggedIn = !!localStorage.getItem('loggedInUser');
+  const isLoggedIn = !!localStorage.getItem(AUTH_USER_KEY);
 
   if (isLoggedIn && (to.path === '/login' || to.path === '/register' || to.path === '/')) {
     // Prevent authenticated users from visiting the login or register pages natively
