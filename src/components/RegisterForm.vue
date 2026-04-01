@@ -24,6 +24,72 @@
         </div>
       </form>
     </div>
+
+    <!-- Success Dialog -->
+    <Dialog
+      v-model:visible="showSuccessDialog"
+      modal
+      header="Success!"
+      :style="{ width: '25rem' }"
+      :closable="false"
+    >
+      <div
+        style="
+          padding: 10px 0 20px 0;
+          color: #444;
+          font-size: 1.05rem;
+          display: flex;
+          align-items: center;
+        "
+      >
+        <i
+          class="pi pi-check-circle"
+          style="color: #22c55e; margin-right: 15px; font-size: 1.5rem"
+        ></i>
+        <span style="line-height: 1.4">Account created successfully!</span>
+      </div>
+      <div style="display: flex; justify-content: flex-end">
+        <Button
+          label="Back to Login"
+          @click="goToLogin"
+          severity="success"
+          autofocus
+        />
+      </div>
+    </Dialog>
+
+    <!-- Error Dialog -->
+    <Dialog
+      v-model:visible="showErrorDialog"
+      modal
+      header="Registration Error"
+      :style="{ width: '25rem' }"
+      :closable="false"
+    >
+      <div
+        style="
+          padding: 10px 0 20px 0;
+          color: #444;
+          font-size: 1.05rem;
+          display: flex;
+          align-items: center;
+        "
+      >
+        <i
+          class="pi pi-exclamation-triangle"
+          style="color: #ef4444; margin-right: 15px; font-size: 1.5rem"
+        ></i>
+        <span style="line-height: 1.4">{{ errorMessage }}</span>
+      </div>
+      <div style="display: flex; justify-content: flex-end">
+        <Button
+          label="Got it"
+          @click="showErrorDialog = false"
+          severity="secondary"
+          autofocus
+        />
+      </div>
+    </Dialog>
   </div>
 </template>
 
@@ -32,6 +98,8 @@ import { ref, computed } from "vue";
 import CustomInput from "./CustomInput.vue";
 import { useRouter } from "vue-router";
 import { useValidation } from "@/composables/useValidation";
+import Dialog from "primevue/dialog";
+import Button from "primevue/button";
 
 import { authApi } from "@/api/auth";
 
@@ -40,6 +108,9 @@ const password = ref("");
 const confirmPassword = ref("");
 const isSubmitted = ref(false);
 const router = useRouter();
+const showSuccessDialog = ref(false);
+const showErrorDialog = ref(false);
+const errorMessage = ref("");
 
 const { validateUserName, validatePassword, validateConfirmPassword } =
   useValidation();
@@ -96,12 +167,17 @@ const handleRegister = async () => {
     });
 
     console.log("Registration successful:", result);
-    alert("Registration successful!");
-    router.push("/login");
+    showSuccessDialog.value = true;
   } catch (error: any) {
     console.error("Registration error:", error);
-    alert(error.message || "An error occurred during registration");
+    errorMessage.value = error.message || "An error occurred during registration";
+    showErrorDialog.value = true;
   }
+};
+
+const goToLogin = () => {
+  showSuccessDialog.value = false;
+  router.push("/login");
 };
 
 const handleBack = () => {

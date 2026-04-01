@@ -125,6 +125,16 @@ export function useStudents() {
     }
   };
 
+  const isCodeAvailable = async (code: string): Promise<boolean> => {
+    try {
+      const student = await studentApi.getStudentByCode(code);
+      return !student; // If we get a student back, the code is NOT available
+    } catch (err) {
+      // If it throws an error (like 404), the code is available
+      return true;
+    }
+  };
+
   return {
     students,
     totalCount,
@@ -143,14 +153,6 @@ export function useStudents() {
     updateStudent,
     deleteStudent,
     exportStudentsData,
-    isCodeAvailable: async (code: string): Promise<boolean> => {
-      try {
-        const student = await studentApi.getStudentByCode(code);
-        return !student; // If we get a student back, the code is NOT available
-      } catch (err) {
-        // If it throws an error (like 404), the code is available
-        return true;
-      }
-    }
+    isCodeAvailable
   };
 }
