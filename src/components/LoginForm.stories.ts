@@ -95,12 +95,12 @@ export const FilledFormAndSubmit: Story = {
 
     await moveCursorTo(userNameInput, canvasElement);
     await userEvent.click(userNameInput);
-    await userEvent.type(userNameInput, 'test@example.com', { delay: 100 });
+    await userEvent.type(userNameInput, 'newuser@domain.com', { delay: 100 });
     await sleep(200);
 
     await moveCursorTo(passwordInput, canvasElement);
     await userEvent.click(passwordInput);
-    await userEvent.type(passwordInput, 'mysecret', { delay: 100 });
+    await userEvent.type(passwordInput, 'SecurePass123!', { delay: 100 });
     await sleep(200);
 
     await moveCursorTo(loginButton, canvasElement);

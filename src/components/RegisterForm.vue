@@ -29,33 +29,19 @@
     <Dialog
       v-model:visible="showSuccessDialog"
       modal
-      header="Success!"
-      :style="{ width: '25rem' }"
+      header="Registration Successful"
+      :style="{ width: '30rem' }"
       :closable="false"
     >
-      <div
-        style="
-          padding: 10px 0 20px 0;
-          color: #444;
-          font-size: 1.05rem;
-          display: flex;
-          align-items: center;
-        "
-      >
-        <i
-          class="pi pi-check-circle"
-          style="color: #22c55e; margin-right: 15px; font-size: 1.5rem"
-        ></i>
-        <span style="line-height: 1.4">Account created successfully!</span>
+      <div class="dialog-content">
+        <i class="pi pi-check-circle" style="font-size: 2rem; color: #4caf50; margin-bottom: 1rem;"></i>
+        <p>Your account has been created successfully. You can now log in to the system.</p>
       </div>
-      <div style="display: flex; justify-content: flex-end">
-        <Button
-          label="Back to Login"
-          @click="goToLogin"
-          severity="success"
-          autofocus
-        />
-      </div>
+      <template #footer>
+        <div style="display: flex; justify-content: flex-end; width: 100%;">
+          <Button label="Go to Login" icon="pi pi-sign-in" @click="navigateToLogin" severity="success" autofocus />
+        </div>
+      </template>
     </Dialog>
 
     <!-- Error Dialog -->
@@ -63,32 +49,17 @@
       v-model:visible="showErrorDialog"
       modal
       header="Registration Error"
-      :style="{ width: '25rem' }"
-      :closable="false"
+      :style="{ width: '30rem' }"
     >
-      <div
-        style="
-          padding: 10px 0 20px 0;
-          color: #444;
-          font-size: 1.05rem;
-          display: flex;
-          align-items: center;
-        "
-      >
-        <i
-          class="pi pi-exclamation-triangle"
-          style="color: #ef4444; margin-right: 15px; font-size: 1.5rem"
-        ></i>
-        <span style="line-height: 1.4">{{ errorMessage }}</span>
+      <div class="dialog-content">
+        <i class="pi pi-exclamation-circle" style="font-size: 2rem; color: #f44336; margin-bottom: 1rem;"></i>
+        <p>{{ errorMessageArr }}</p>
       </div>
-      <div style="display: flex; justify-content: flex-end">
-        <Button
-          label="Got it"
-          @click="showErrorDialog = false"
-          severity="secondary"
-          autofocus
-        />
-      </div>
+      <template #footer>
+        <div style="display: flex; justify-content: flex-end; width: 100%;">
+          <Button label="Close" @click="showErrorDialog = false" severity="secondary" autofocus />
+        </div>
+      </template>
     </Dialog>
   </div>
 </template>
@@ -107,10 +78,10 @@ const userName = ref("");
 const password = ref("");
 const confirmPassword = ref("");
 const isSubmitted = ref(false);
-const router = useRouter();
 const showSuccessDialog = ref(false);
 const showErrorDialog = ref(false);
-const errorMessage = ref("");
+const errorMessageArr = ref("");
+const router = useRouter();
 
 const { validateUserName, validatePassword, validateConfirmPassword } =
   useValidation();
@@ -170,18 +141,18 @@ const handleRegister = async () => {
     showSuccessDialog.value = true;
   } catch (error: any) {
     console.error("Registration error:", error);
-    errorMessage.value = error.message || "An error occurred during registration";
+    errorMessageArr.value = error.message || "An error occurred during registration";
     showErrorDialog.value = true;
   }
 };
 
-const goToLogin = () => {
-  showSuccessDialog.value = false;
+const handleBack = () => {
+  console.log("Navigating back to Login...");
   router.push("/login");
 };
 
-const handleBack = () => {
-  console.log("Navigating back to Login...");
+const navigateToLogin = () => {
+  showSuccessDialog.value = false;
   router.push("/login");
 };
 </script>
@@ -252,5 +223,19 @@ h1 {
 .back-btn:hover {
   background-color: #f0f0f0;
   border-color: #aaa;
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.dialog-content p {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: #444;
 }
 </style>
