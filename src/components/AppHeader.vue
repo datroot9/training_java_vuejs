@@ -22,6 +22,7 @@ const username = ref(localStorage.getItem(AUTH_USER_KEY) || 'Guest User');
 const handleLogout = () => {
   // Completely clear the saved user session securely on logout
   localStorage.removeItem(AUTH_USER_KEY);
+  localStorage.removeItem('token');
 };
 </script>
 

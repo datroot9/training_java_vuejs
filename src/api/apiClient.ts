@@ -5,15 +5,36 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export const apiClient = {
+  getHeaders(isBlob: boolean = false): HeadersInit {
+    const token = localStorage.getItem('token');
+    const headers: Record<string, string> = {};
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    if (!isBlob) {
+      headers['Content-Type'] = 'application/json';
+    }
+    
+    return headers;
+  },
+
+  setToken(token: string) {
+    localStorage.setItem('token', token);
+  },
+
   async get(endpoint: string) {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`);
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      headers: this.getHeaders(),
+    });
     return this.handleResponse(response);
   },
 
   async post(endpoint: string, body: any) {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.getHeaders(),
       body: JSON.stringify(body)
     });
     return this.handleResponse(response);
@@ -22,7 +43,7 @@ export const apiClient = {
   async put(endpoint: string, body: any) {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.getHeaders(),
       body: JSON.stringify(body)
     });
     return this.handleResponse(response);
@@ -30,7 +51,8 @@ export const apiClient = {
 
   async delete(endpoint: string) {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: this.getHeaders(),
     });
     return this.handleResponse(response);
   },

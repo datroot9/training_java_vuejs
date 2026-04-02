@@ -16,7 +16,7 @@ export interface AuthResponse {
   message: string;
   data: {
     username: string;
-    token?: string; 
+    token: string; 
     // Add additional backend user metadata mapping here if required!
   };
 }

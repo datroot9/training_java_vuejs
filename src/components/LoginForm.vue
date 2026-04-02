@@ -94,7 +94,7 @@ const handleLogin = async () => {
 
     console.log("Login successful:", data);
     // Store the active username globally in localStorage so it persists!
-    localStorage.setItem(AUTH_USER_KEY, userName.value);
+    localStorage.setItem(AUTH_USER_KEY, data.data.username);
     router.push("/screens");
   } catch (error: any) {
     console.error("Error during login:", error);

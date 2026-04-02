@@ -73,7 +73,9 @@ export const studentApi = {
   async exportStudents(): Promise<void> {
     // Handling blob specifically since apiClient.get assumes JSON
     const API_BASE_URL = import.meta.env.VITE_API_URL;
-    const response = await fetch(`${API_BASE_URL}/students/export`);
+    const response = await fetch(`${API_BASE_URL}/students/export`, {
+      headers: apiClient.getHeaders(true)
+    });
 
     if (!response.ok) {
       throw new Error(`Failed to export students: ${response.statusText}`);
