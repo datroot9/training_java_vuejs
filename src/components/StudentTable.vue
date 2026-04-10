@@ -1,15 +1,16 @@
 <template>
-  <DataTable
-    :value="students"
-    :loading="loading"
-    paginator
-    :rows="pageSize"
-    :totalRecords="totalCount"
-    :first="(currentPage - 1) * pageSize"
-    @page="$emit('page', $event)"
-    @sort="$emit('sort', $event)"
-    lazy
-  >
+  <div class="table-shell">
+    <DataTable
+      :value="students"
+      :loading="loading"
+      paginator
+      :rows="pageSize"
+      :totalRecords="totalCount"
+      :first="(currentPage - 1) * pageSize"
+      @page="$emit('page', $event)"
+      @sort="$emit('sort', $event)"
+      lazy
+    >
     <template #paginatorfirstpagelinkicon unstyled>first</template>
     <template #paginatorprevpagelinkicon unstyled>prev</template>
     <template #paginatornextpagelinkicon unstyled>next</template>
@@ -67,27 +68,28 @@
     </Column>
     
     <!-- Actions Column -->
-    <Column header="Edit">
+    <Column header="Actions">
       <template #body="{ data }">
         <a
           href="#"
           @click.prevent="$emit('edit', data)"
-          style="
-            margin-right: 15px;
-            color: #1a73e8;
-            text-decoration: none;
-          "
-          >edit</a
+          class="action-link action-link--edit"
+          aria-label="Edit student"
+          title="Edit student"
+          ><i class="pi pi-pen-to-square" aria-hidden="true"></i></a
         >
         <a
           href="#"
           @click.prevent="$emit('delete', data)"
-          style="color: #ea4335; text-decoration: none"
-          >delete</a
+          class="action-link action-link--delete"
+          aria-label="Delete student"
+          title="Delete student"
+          ><i class="pi pi-trash" aria-hidden="true"></i></a
         >
       </template>
     </Column>
-  </DataTable>
+    </DataTable>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -108,20 +110,51 @@ defineEmits(['page', 'sort', 'edit', 'delete']);
 </script>
 
 <style scoped>
-/* These styles keep the DataTable look and feel consistent with original UI requirements */
-:deep(.p-datatable-thead > tr > th) {
-  background-color: #cccdcd;
-  padding: 12px 16px;
-  border: 1px solid #7d7c7d;
+:deep(.p-datatable) {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  box-shadow:
+    0 6px 18px rgba(2, 6, 23, 0.07),
+    0 2px 8px rgba(16, 185, 129, 0.08);
 }
+
+.table-shell {
+  position: relative;
+  margin-top: 10px;
+}
+
+.table-shell::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4px;
+  z-index: 2;
+  border-radius: 14px 14px 0 0;
+  background: linear-gradient(90deg, #047857, #10b981, #34d399);
+}
+
+:deep(.p-datatable-thead > tr > th) {
+  background: linear-gradient(180deg, #ecfdf5 0%, #dcfce7 100%);
+  padding: 13px 16px;
+  border: 1px solid #a7f3d0;
+}
+
 :deep(.p-datatable-tbody > tr > td) {
   background-color: #ffffff;
-  padding: 12px 16px;
-  border: 1px solid #7d7c7d;
+  padding: 13px 16px;
+  border: 1px solid #d1fae5;
+  color: #0f172a;
 }
 
 :deep(.p-datatable-tbody > tr:nth-child(even) > td) {
-  background-color: #f4f6f8;
+  background-color: #f8fffb;
+}
+
+:deep(.p-datatable-tbody > tr:hover > td) {
+  background-color: #ecfdf5;
 }
 
 :deep(.p-datatable-column-header-content) {
@@ -129,26 +162,41 @@ defineEmits(['page', 'sort', 'edit', 'delete']);
   flex-direction: row-reverse;
   justify-content: flex-end;
   gap: 8px;
-  font-weight: 600;
-  color: #555;
+  font-weight: 700;
+  color: #065f46;
+}
+
+:deep(.p-sortable-column:hover .p-datatable-column-header-content) {
+  color: #047857;
 }
 
 :deep(.p-paginator-content button) {
   display: block;
-  background-color: #cccdcd;
-  border-radius: 5px;
-  color: black;
-  border: 1px solid #555;
+  background-color: #ffffff;
+  border-radius: 9px;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+  min-width: 36px;
+  height: 36px;
+  font-weight: 600;
+  transition: all 0.15s ease;
 }
 
 :deep(.p-paginator-content button.p-paginator-page[data-p-highlight="true"]),
 :deep(.p-paginator-content button.p-paginator-page.p-highlight),
 :deep(.p-paginator-content button.p-paginator-page.p-paginator-page-selected) {
-  background-color: #fef874;
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  border-color: #059669;
+  color: #ffffff;
 }
 
 :deep(.p-paginator-content button:active) {
-  background-color: #fef874 !important;
+  transform: scale(0.98);
+}
+
+:deep(.p-paginator-content button:hover:not(.p-disabled)) {
+  border-color: #34d399;
+  background-color: #ecfdf5;
 }
 
 :deep(.p-datatable) {
@@ -163,5 +211,49 @@ defineEmits(['page', 'sort', 'edit', 'delete']);
 
 :deep(.p-paginator .p-paginator-pages) {
   margin: 0 28px;
+}
+
+.action-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.84rem;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.action-link i {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.action-link + .action-link {
+  margin-left: 10px;
+}
+
+.action-link--edit {
+  color: #065f46;
+  border-color: #6ee7b7;
+  background-color: #ecfdf5;
+}
+
+.action-link--edit:hover {
+  background-color: #d1fae5;
+  border-color: #34d399;
+}
+
+.action-link--delete {
+  color: #b91c1c;
+  border-color: #fca5a5;
+  background-color: #fff1f2;
+}
+
+.action-link--delete:hover {
+  background-color: #ffe4e6;
+  border-color: #fb7185;
 }
 </style>
