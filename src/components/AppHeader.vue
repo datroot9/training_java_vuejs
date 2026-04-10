@@ -6,7 +6,7 @@
       </div>
       <div class="brand">
         <h2 class="brand-title">Student Management</h2>
-        <span class="brand-subtitle">Green • Clean • Fast</span>
+        <span class="brand-subtitle">Safe • Clean • Fast</span>
       </div>
     </div>
     <div class="user-controls">
