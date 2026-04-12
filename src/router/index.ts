@@ -36,7 +36,7 @@ const router = createRouter({
   ]
 })
 
-import { AUTH_USER_KEY } from '@/utils/constants'
+import { AUTH_USER_KEY, AUTH_ROLE_KEY } from '@/utils/constants'
 
 // Configure Global Route Guards to securely handle authenticated session redirects
 router.beforeEach((to, from, next) => {
@@ -45,6 +45,13 @@ router.beforeEach((to, from, next) => {
 
   if (isLoggedIn && (to.path === '/login' || to.path === '/register' || to.path === '/')) {
     // Prevent authenticated users from visiting the login or register pages natively
+    next('/screens');
+  } else if (
+    isLoggedIn &&
+    to.name === 'student-setup' &&
+    localStorage.getItem(AUTH_ROLE_KEY) !== 'ADMIN'
+  ) {
+    // Only admins may create or edit students (POST/PUT APIs).
     next('/screens');
   } else if (!isLoggedIn && (to.path === '/screens' || to.name === 'student-setup')) {
     // Block unauthenticated guests from bypassing the login page directly into the dashboard!

@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { AUTH_USER_KEY } from '@/utils/constants';
+import { AUTH_USER_KEY, AUTH_ROLE_KEY } from '@/utils/constants';
 
 // Dynamically pull the logged in user from local storage! (Fallback to Guest)
 const username = ref(localStorage.getItem(AUTH_USER_KEY) || 'Guest User');
@@ -35,6 +35,7 @@ const username = ref(localStorage.getItem(AUTH_USER_KEY) || 'Guest User');
 const handleLogout = () => {
   // Completely clear the saved user session securely on logout
   localStorage.removeItem(AUTH_USER_KEY);
+  localStorage.removeItem(AUTH_ROLE_KEY);
   localStorage.removeItem('token');
 };
 </script>
