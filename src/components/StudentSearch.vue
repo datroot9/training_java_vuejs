@@ -2,15 +2,24 @@
   <div class="Searching-student-groups">
     <div class="search-inputs">
       <div class="input-group">
-        <label for="search-name">Student Name</label>
-        <InputText id="search-name" v-model="name" />
+        <label for="search-name">
+          <i class="pi pi-user field-icon" aria-hidden="true" />
+          <span>Student Name</span>
+        </label>
+        <InputText id="search-name" v-model="name" placeholder="Search by name" />
       </div>
       <div class="input-group">
-        <label for="search-code">Student Code</label>
-        <InputText id="search-code" v-model="code" />
+        <label for="search-code">
+          <i class="pi pi-barcode field-icon" aria-hidden="true" />
+          <span>Student Code</span>
+        </label>
+        <InputText id="search-code" v-model="code" placeholder="Search by code" />
       </div>
       <div class="input-group">
-        <label for="search-birthday">Birthday</label>
+        <label for="search-birthday">
+          <i class="pi pi-calendar field-icon" aria-hidden="true" />
+          <span>Birthday</span>
+        </label>
         <InputText
           id="search-birthday"
           v-model="birthday"
@@ -93,10 +102,19 @@ defineEmits(['search', 'add', 'export']);
 }
 
 .input-group label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
   font-weight: 700;
   color: #065f46;
   font-size: 0.9rem;
   min-width: 120px;
+}
+
+.field-icon {
+  color: #059669;
+  font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .search-inputs :deep(.p-inputtext) {
