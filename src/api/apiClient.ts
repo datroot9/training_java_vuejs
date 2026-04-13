@@ -62,7 +62,22 @@ export const apiClient = {
     const data = isJson ? await response.json() : null;
 
     if (!response.ok) {
-      const error = (data && data.message) || response.statusText;
+      const msg = data?.message as string | undefined;
+      const fieldErrors = data?.data;
+      let error = msg;
+      if (
+        !error &&
+        fieldErrors &&
+        typeof fieldErrors === 'object' &&
+        !Array.isArray(fieldErrors)
+      ) {
+        error = Object.entries(fieldErrors as Record<string, string>)
+          .map(([k, v]) => `${k}: ${v}`)
+          .join('; ');
+      }
+      if (!error) {
+        error = response.statusText;
+      }
       throw new Error(error);
     }
 

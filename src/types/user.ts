@@ -15,8 +15,9 @@ export interface AuthResponse {
   code: number;
   message: string;
   data: {
+    id?: number;
     username: string;
-    token: string; 
-    // Add additional backend user metadata mapping here if required!
+    token?: string;
+    role?: string;
   };
 }

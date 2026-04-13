@@ -27,6 +27,7 @@
         unstyled
       />
       <Button
+        v-if="showAdd"
         @click="$emit('add')"
         label="Add Student"
         icon="pi pi-user-plus"
@@ -51,6 +52,14 @@ import Button from "primevue/button";
 const name = defineModel<string>('name');
 const code = defineModel<string>('code');
 const birthday = defineModel<string>('birthday');
+
+withDefaults(
+  defineProps<{
+    /** Only admins may create students (POST). */
+    showAdd?: boolean;
+  }>(),
+  { showAdd: false }
+);
 
 defineEmits(['search', 'add', 'export']);
 </script>

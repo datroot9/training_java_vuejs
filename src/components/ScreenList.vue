@@ -5,6 +5,7 @@
       v-model:name="searchName"
       v-model:code="searchCode"
       v-model:birthday="searchBirthday"
+      :show-add="isAdmin"
       @search="handleSearchStudent"
       @add="router.push('/student/setup')"
       @export="handleExport"
@@ -12,6 +13,7 @@
 
     <!-- Modularized Student Table -->
     <StudentTable
+      :is-admin="isAdmin"
       :students="students"
       :loading="isLoading"
       :total-count="totalCount"
@@ -68,7 +70,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
+import { AUTH_ROLE_KEY } from "@/utils/constants";
 import { useRouter } from "vue-router";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
@@ -82,6 +85,8 @@ import { useToast } from "primevue/usetoast";
 
 const router = useRouter();
 const toast = useToast();
+
+const isAdmin = computed(() => localStorage.getItem(AUTH_ROLE_KEY) === "ADMIN");
 const showErrorPopup = ref(false);
 const showDeletePopup = ref(false);
 const studentToDelete = ref<Student | null>(null);

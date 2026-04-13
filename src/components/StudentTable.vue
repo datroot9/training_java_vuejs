@@ -71,6 +71,7 @@
     <Column header="Actions">
       <template #body="{ data }">
         <a
+          v-if="isAdmin"
           href="#"
           @click.prevent="$emit('edit', data)"
           class="action-link action-link--edit"
@@ -79,6 +80,7 @@
           ><i class="pi pi-pen-to-square" aria-hidden="true"></i></a
         >
         <a
+          v-if="isAdmin"
           href="#"
           @click.prevent="$emit('delete', data)"
           class="action-link action-link--delete"
@@ -97,14 +99,18 @@ import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import type { Student } from "../types/student";
 
-defineProps<{
-  students: Student[];
-  loading: boolean;
-  totalCount: number;
-  pageSize: number;
-  currentPage: number;
-  sortOrder?: 'asc' | 'desc';
-}>();
+withDefaults(
+  defineProps<{
+    students: Student[];
+    loading: boolean;
+    totalCount: number;
+    pageSize: number;
+    currentPage: number;
+    sortOrder?: 'asc' | 'desc';
+    isAdmin?: boolean;
+  }>(),
+  { isAdmin: false }
+);
 
 defineEmits(['page', 'sort', 'edit', 'delete']);
 </script>
