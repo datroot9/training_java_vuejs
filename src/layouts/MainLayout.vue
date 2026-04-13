@@ -18,12 +18,13 @@ import AppHeader from '../components/AppHeader.vue';
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
   background: radial-gradient(1200px 800px at 15% 0%, rgba(16, 185, 129, 0.18) 0%, rgba(255, 255, 255, 0) 55%),
     radial-gradient(1000px 700px at 85% 10%, rgba(52, 211, 153, 0.18) 0%, rgba(255, 255, 255, 0) 60%),
     linear-gradient(180deg, #f0fdf4 0%, #ffffff 45%, #f8fafc 100%);
   font-family: Inter, Roboto, sans-serif;
   color: black;
+  overflow-x: hidden;
 }
 
 .main-content {
@@ -67,6 +68,17 @@ import AppHeader from '../components/AppHeader.vue';
 
   .content-card {
     padding: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 12px;
+  }
+
+  .content-card {
+    padding: 14px;
+    border-radius: 12px;
   }
 }
 </style>

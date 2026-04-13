@@ -6,6 +6,7 @@
       v-model:code="searchCode"
       v-model:birthday="searchBirthday"
       :show-add="isAdmin"
+      :export-loading="isExporting"
       @search="handleSearchStudent"
       @add="router.push('/student/setup')"
       @export="handleExport"
@@ -31,7 +32,7 @@
       v-model:visible="showErrorPopup"
       modal
       header="Validation Error"
-      :style="{ width: '25rem' }"
+      :style="{ width: 'min(25rem, 92vw)' }"
       :closable="false"
     >
       <div
@@ -91,6 +92,7 @@ const showErrorPopup = ref(false);
 const showDeletePopup = ref(false);
 const studentToDelete = ref<Student | null>(null);
 const errorMessage = ref("");
+const isExporting = ref(false);
 const searchName = ref("");
 const searchCode = ref("");
 const searchBirthday = ref("");
@@ -155,11 +157,14 @@ const confirmDeleteStudent = async () => {
 };
 
 const handleExport = async () => {
+  isExporting.value = true;
   try {
     await exportStudentsData();
   } catch (err) {
     errorMessage.value = err instanceof Error ? err.message : "Failed to export CSV";
     showErrorPopup.value = true;
+  } finally {
+    isExporting.value = false;
   }
 };
 

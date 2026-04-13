@@ -5,10 +5,9 @@
       :loading="loading"
       paginator
       :rows="pageSize"
-      :rowsPerPageOptions="[5, 10, 20]"
       :totalRecords="totalCount"
       :first="(currentPage - 1) * pageSize"
-      paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
+      paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
       currentPageReportTemplate="{first} - {last} of {totalRecords}"
       @page="$emit('page', $event)"
       @sort="$emit('sort', $event)"
@@ -23,7 +22,21 @@
             <p class="caption-subtitle">Manage and review student records quickly.</p>
           </div>
         </div>
-        <span class="caption-total">{{ totalCount }} total</span>
+        <div class="caption-meta">
+          <span class="caption-total">{{ totalCount }} total</span>
+          <label class="rows-control">
+            <span>Rows</span>
+            <select
+              :value="String(pageSize)"
+              @change="onRowsChange"
+              aria-label="Rows per page"
+            >
+              <option v-for="option in rowOptions" :key="option" :value="option">
+                {{ option }}
+              </option>
+            </select>
+          </label>
+        </div>
       </div>
     </template>
 
@@ -151,7 +164,21 @@ const props = withDefaults(
   { isAdmin: false }
 );
 
-defineEmits(['page', 'sort', 'edit', 'delete']);
+const rowOptions = [5, 10, 20];
+
+const emit = defineEmits<{
+  (e: 'page', payload: { first: number; page: number; rows: number }): void;
+  (e: 'sort', payload: unknown): void;
+  (e: 'edit', payload: Student): void;
+  (e: 'delete', payload: Student): void;
+}>();
+
+const onRowsChange = (event: Event) => {
+  const target = event.target as HTMLSelectElement | null;
+  const rows = Number(target?.value);
+  if (!Number.isFinite(rows) || rows <= 0) return;
+  emit('page', { first: 0, page: 0, rows });
+};
 
 const getRowNumber = (rowIndex: number) => {
   const ascOrderNumber = (props.currentPage - 1) * props.pageSize + rowIndex + 1;
@@ -235,6 +262,31 @@ const getScoreClass = (score: number) => {
   color: #047857;
 }
 
+.caption-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.rows-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #065f46;
+}
+
+.rows-control select {
+  border: 1px solid #a7f3d0;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 0.2rem 0.45rem;
+  color: #065f46;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
 :deep(.p-datatable) {
   border-radius: 14px;
   overflow: hidden;
@@ -247,6 +299,13 @@ const getScoreClass = (score: number) => {
 .table-shell {
   position: relative;
   margin-top: 10px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Keep desktop columns readable while allowing horizontal swipe on mobile. */
+:deep(.p-datatable-table) {
+  min-width: 880px;
 }
 
 .table-shell::before {
@@ -486,6 +545,33 @@ const getScoreClass = (score: number) => {
 
   .caption-subtitle {
     display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-caption {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+
+  .caption-meta {
+    align-self: flex-start;
+  }
+
+  .action-link {
+    padding: 4px 8px;
+  }
+
+  .action-link + .action-link {
+    margin-left: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  ::deep(.p-paginator-content button) {
+    min-width: 32px;
+    height: 32px;
   }
 }
 </style>

@@ -176,7 +176,7 @@ const navigateToLogin = () => {
 }
 
 .register-container {
-  width: 400px;
+  width: min(100%, 400px);
   padding: 30px;
   border: 1px solid rgba(255, 255, 255, 0.42);
   border-radius: 14px;
@@ -245,5 +245,26 @@ h1 {
   font-size: 1.1rem;
   line-height: 1.5;
   color: #444;
+}
+
+@media (max-width: 480px) {
+  .register-wrapper {
+    padding: 14px;
+  }
+
+  .register-container {
+    padding: 20px 16px;
+  }
+
+  .button-group {
+    justify-content: stretch;
+  }
+
+  .back-btn,
+  .register-btn {
+    flex: 1;
+    min-width: 0;
+    padding: 11px 12px;
+  }
 }
 </style>

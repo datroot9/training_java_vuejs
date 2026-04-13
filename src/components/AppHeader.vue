@@ -55,6 +55,7 @@ const handleLogout = () => {
   display: flex;
   align-items: center;
   gap: 15px;
+  min-width: 0;
 }
 
 .logo-mark {
@@ -74,6 +75,7 @@ const handleLogout = () => {
   flex-direction: column;
   gap: 2px;
   line-height: 1.1;
+  min-width: 0;
 }
 
 .brand-title {
@@ -97,6 +99,7 @@ const handleLogout = () => {
   display: flex;
   align-items: center;
   gap: 20px;
+  min-width: 0;
 }
 
 .username {
@@ -107,6 +110,10 @@ const handleLogout = () => {
   border: 1px solid rgba(16, 185, 129, 0.18);
   padding: 8px 12px;
   border-radius: 999px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: min(55vw, 360px);
 }
 
 .username strong {
@@ -148,10 +155,26 @@ const handleLogout = () => {
     gap: 12px;
   }
 
+  .logo {
+    gap: 10px;
+  }
+
+  .brand-title {
+    font-size: 1.25rem;
+  }
+
+  .brand-subtitle {
+    font-size: 0.78rem;
+  }
+
   .user-controls {
     justify-content: space-between;
     gap: 10px;
     flex-wrap: wrap;
+  }
+
+  .username {
+    max-width: calc(100% - 56px);
   }
 }
 </style>

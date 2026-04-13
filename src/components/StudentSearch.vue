@@ -48,6 +48,8 @@
         label="Export"
         icon="pi pi-download"
         class="export-btn action-btn"
+        :loading="exportLoading"
+        :disabled="exportLoading"
         unstyled
       />
     </div>
@@ -66,8 +68,10 @@ withDefaults(
   defineProps<{
     /** Only admins may create students (POST). */
     showAdd?: boolean;
+    /** Show loading state for Export button. */
+    exportLoading?: boolean;
   }>(),
-  { showAdd: false }
+  { showAdd: false, exportLoading: false }
 );
 
 defineEmits(['search', 'add', 'export']);
@@ -76,9 +80,9 @@ defineEmits(['search', 'add', 'export']);
 <style scoped>
 .Searching-student-groups {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: stretch;
-  gap: 40px;
+  gap: 18px;
   margin-bottom: 25px;
   padding: 18px;
   border-radius: 14px;
@@ -91,7 +95,8 @@ defineEmits(['search', 'add', 'export']);
   display: flex;
   flex-direction: column;
   gap: 15px;
-  width: 400px; /* Give the inputs a structured visual width instead of bleeding 100% space */
+  width: min(100%, 460px); /* Keep width fluid while preserving desktop structure */
+  flex: 0 1 460px;
 }
 
 .input-group {
@@ -209,6 +214,36 @@ defineEmits(['search', 'add', 'export']);
     flex-direction: row;
     flex-wrap: wrap;
     min-width: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .Searching-student-groups {
+    padding: 14px;
+  }
+
+  .input-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .input-group label {
+    min-width: 0;
+  }
+
+  .search-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .search-actions .action-btn {
+    width: 100%;
+  }
+
+  .search-actions .action-btn:last-child {
+    grid-column: 1 / -1;
   }
 }
 </style>

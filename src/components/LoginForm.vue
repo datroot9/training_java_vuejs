@@ -178,7 +178,7 @@ const handleLogin = async () => {
 }
 
 .login-container {
-  width: 400px;
+  width: min(100%, 400px);
   padding: 30px;
   border: 1px solid rgba(255, 255, 255, 0.42);
   border-radius: 14px;
@@ -227,7 +227,7 @@ h1 {
 .sign-up-options {
   text-align: center;
   padding: 10px;
-  width: 400px;
+  width: min(100%, 400px);
   border: 1px solid rgba(255, 255, 255, 0.42);
   border-radius: 14px;
   background-color: rgba(255, 255, 255, 0.88);
@@ -245,5 +245,15 @@ h1 {
   text-decoration: none;
   font-weight: 600;
   transition: color 0.3s;
+}
+
+@media (max-width: 480px) {
+  .login-wrapper {
+    padding: 14px;
+  }
+
+  .login-container {
+    padding: 20px 16px;
+  }
 }
 </style>
