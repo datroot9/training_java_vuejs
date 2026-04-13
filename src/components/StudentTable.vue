@@ -5,12 +5,28 @@
       :loading="loading"
       paginator
       :rows="pageSize"
+      :rowsPerPageOptions="[5, 10, 20]"
       :totalRecords="totalCount"
       :first="(currentPage - 1) * pageSize"
+      paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
+      currentPageReportTemplate="{first} - {last} of {totalRecords}"
       @page="$emit('page', $event)"
       @sort="$emit('sort', $event)"
       lazy
     >
+    <template #header>
+      <div class="table-caption">
+        <div class="caption-title-wrap">
+          <i class="pi pi-users caption-icon" aria-hidden="true"></i>
+          <div>
+            <h3 class="caption-title">Students</h3>
+            <p class="caption-subtitle">Manage and review student records quickly.</p>
+          </div>
+        </div>
+        <span class="caption-total">{{ totalCount }} total</span>
+      </div>
+    </template>
+
     <template #paginatorfirstpagelinkicon unstyled>first</template>
     <template #paginatorprevpagelinkicon unstyled>prev</template>
     <template #paginatornextpagelinkicon unstyled>next</template>
@@ -19,11 +35,7 @@
     <!-- No Column -->
     <Column sortField="id" header="No" sortable>
       <template #body="slotProps">
-        {{ 
-          sortOrder === 'desc' 
-            ? (students.length - slotProps.index) 
-            : (slotProps.index + 1)
-        }}
+        {{ getRowNumber(slotProps.index) }}
       </template>
       <template #sorticon="{ sortOrder }">
         <span v-if="sortOrder === 1" style="font-size: 0.8rem">▲</span>
@@ -34,6 +46,9 @@
 
     <!-- Other Columns -->
     <Column field="code" header="Code" sortable>
+      <template #body="{ data }">
+        <span class="code-pill">{{ data.code }}</span>
+      </template>
       <template #sorticon="{ sortOrder }">
         <span v-if="sortOrder === 1" style="font-size: 0.8rem">▲</span
         ><span v-else-if="sortOrder === -1" style="font-size: 0.8rem"
@@ -42,6 +57,9 @@
       </template>
     </Column>
     <Column field="name" header="Name" sortable>
+      <template #body="{ data }">
+        <span class="name-text" :title="data.name">{{ data.name }}</span>
+      </template>
       <template #sorticon="{ sortOrder }">
         <span v-if="sortOrder === 1" style="font-size: 0.8rem">▲</span
         ><span v-else-if="sortOrder === -1" style="font-size: 0.8rem"
@@ -50,6 +68,9 @@
       </template>
     </Column>
     <Column field="birthday" header="Birthday" sortable>
+      <template #body="{ data }">
+        <span>{{ formatBirthday(data.birthday) }}</span>
+      </template>
       <template #sorticon="{ sortOrder }">
         <span v-if="sortOrder === 1" style="font-size: 0.8rem">▲</span
         ><span v-else-if="sortOrder === -1" style="font-size: 0.8rem"
@@ -57,8 +78,17 @@
         ><span v-else style="font-size: 0.8rem; color: #aaa">▲</span>
       </template>
     </Column>
-    <Column field="address" header="Address"></Column>
+    <Column field="address" header="Address">
+      <template #body="{ data }">
+        <span class="address-text" :title="data.address">{{ data.address }}</span>
+      </template>
+    </Column>
     <Column field="averageScore" header="Score" sortable>
+      <template #body="{ data }">
+        <span class="score-pill" :class="getScoreClass(data.averageScore)">
+          {{ formatScore(data.averageScore) }}
+        </span>
+      </template>
       <template #sorticon="{ sortOrder }">
         <span v-if="sortOrder === 1" style="font-size: 0.8rem">▲</span
         ><span v-else-if="sortOrder === -1" style="font-size: 0.8rem"
@@ -88,8 +118,17 @@
           title="Delete student"
           ><i class="pi pi-trash" aria-hidden="true"></i></a
         >
+        <span v-else class="no-actions">—</span>
       </template>
     </Column>
+
+    <template #empty>
+      <div class="empty-state">
+        <i class="pi pi-inbox empty-icon" aria-hidden="true"></i>
+        <p class="empty-title">No students found</p>
+        <p class="empty-text">Try another search filter or add a new student.</p>
+      </div>
+    </template>
     </DataTable>
   </div>
 </template>
@@ -99,7 +138,7 @@ import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import type { Student } from "../types/student";
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     students: Student[];
     loading: boolean;
@@ -113,9 +152,89 @@ withDefaults(
 );
 
 defineEmits(['page', 'sort', 'edit', 'delete']);
+
+const getRowNumber = (rowIndex: number) => {
+  const ascOrderNumber = (props.currentPage - 1) * props.pageSize + rowIndex + 1;
+  if (props.sortOrder === 'desc') {
+    return Math.max(props.totalCount - ascOrderNumber + 1, 1);
+  }
+  return ascOrderNumber;
+};
+
+const formatBirthday = (birthday: string) => {
+  const normalized = birthday?.trim();
+  if (!normalized) return '-';
+
+  // Keep a stable display format regardless of user locale.
+  const directMatch = normalized.match(/^(\d{4})[-/](\d{2})[-/](\d{2})$/);
+  if (directMatch) {
+    const [, year, month, day] = directMatch;
+    return `${year}/${month}/${day}`;
+  }
+
+  const date = new Date(normalized.replace(/\//g, '-'));
+  if (Number.isNaN(date.getTime())) return birthday || '-';
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}/${month}/${day}`;
+};
+
+const formatScore = (score: number) => Number(score).toFixed(2).replace(/\.00$/, '');
+
+const getScoreClass = (score: number) => {
+  const normalizedScore = score > 10 ? score / 10 : score;
+  if (normalizedScore >= 8) return 'score-pill--great';
+  if (normalizedScore >= 6.5) return 'score-pill--good';
+  if (normalizedScore >= 5) return 'score-pill--fair';
+  return 'score-pill--low';
+};
 </script>
 
 <style scoped>
+.table-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.35rem 0;
+}
+
+.caption-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.caption-icon {
+  color: #059669;
+  font-size: 1.2rem;
+}
+
+.caption-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #065f46;
+}
+
+.caption-subtitle {
+  margin: 0.1rem 0 0;
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+.caption-total {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 999px;
+  border: 1px solid #a7f3d0;
+  background: #f0fdf4;
+  color: #047857;
+}
+
 :deep(.p-datatable) {
   border-radius: 14px;
   overflow: hidden;
@@ -219,6 +338,17 @@ defineEmits(['page', 'sort', 'edit', 'delete']);
   margin: 0 28px;
 }
 
+:deep(.p-paginator-current) {
+  margin-left: 0.75rem;
+  color: #475569;
+  font-size: 0.86rem;
+}
+
+:deep(.p-paginator-rpp-dropdown) {
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+}
+
 .action-link {
   display: inline-flex;
   align-items: center;
@@ -261,5 +391,101 @@ defineEmits(['page', 'sort', 'edit', 'delete']);
 .action-link--delete:hover {
   background-color: #ffe4e6;
   border-color: #fb7185;
+}
+
+.code-pill {
+  display: inline-block;
+  padding: 0.2rem 0.52rem;
+  border-radius: 999px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  font-size: 0.8rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  color: #334155;
+}
+
+.name-text {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.address-text {
+  display: inline-block;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #334155;
+}
+
+.score-pill {
+  display: inline-block;
+  min-width: 56px;
+  text-align: center;
+  font-weight: 700;
+  padding: 0.22rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  border: 1px solid transparent;
+}
+
+.score-pill--great {
+  color: #065f46;
+  background: #d1fae5;
+  border-color: #6ee7b7;
+}
+
+.score-pill--good {
+  color: #1d4ed8;
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+.score-pill--fair {
+  color: #92400e;
+  background: #fef3c7;
+  border-color: #fcd34d;
+}
+
+.score-pill--low {
+  color: #b91c1c;
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.no-actions {
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 1.6rem 1rem;
+  color: #475569;
+}
+
+.empty-icon {
+  font-size: 1.6rem;
+  color: #94a3b8;
+}
+
+.empty-title {
+  margin: 0.45rem 0 0.25rem;
+  font-weight: 700;
+}
+
+.empty-text {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+  .address-text {
+    max-width: 180px;
+  }
+
+  .caption-subtitle {
+    display: none;
+  }
 }
 </style>

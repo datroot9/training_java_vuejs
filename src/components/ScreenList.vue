@@ -101,9 +101,10 @@ const {
   currentPage,
   pageSize,
   isLoading,
+  currentSearchParams,
+  currentSortBy,
   currentSortOrder,
   fetchStudents,
-  goToPage,
   deleteStudent,
   exportStudentsData,
 } = useStudents();
@@ -163,8 +164,23 @@ const handleExport = async () => {
 };
 
 const updatePage = (event: any) => {
-  const newPage = Math.floor(event.first / event.rows) + 1;
-  goToPage(newPage);
+  const rows = Number(event?.rows);
+  if (!Number.isFinite(rows) || rows <= 0) {
+    return;
+  }
+  const pageIndex =
+    typeof event?.page === "number"
+      ? event.page
+      : Math.floor((Number(event?.first ?? 0) || 0) / rows);
+  const newPage = pageIndex + 1;
+
+  fetchStudents(
+    newPage,
+    rows,
+    currentSearchParams.value,
+    currentSortBy.value,
+    currentSortOrder.value
+  );
 };
 
 const onSort = (event: any) => {

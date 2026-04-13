@@ -22,10 +22,11 @@ export const studentApi = {
     sortBy?: string,
     sortOrder?: "asc" | "desc",
   ): Promise<PaginatedResponse> {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      pageSize: pageSize.toString(),
-    });
+    const params = new URLSearchParams({ page: page.toString() });
+    const normalizedPageSize = pageSize.toString();
+    // Send both keys for backend compatibility (`pageSize` vs `size`).
+    params.set("pageSize", normalizedPageSize);
+    params.set("size", normalizedPageSize);
 
     if (searchParams?.name) params.append("name", searchParams.name);
     if (searchParams?.code) params.append("code", searchParams.code);
@@ -37,12 +38,20 @@ export const studentApi = {
     
     // Transform the nested API response to match PaginatedResponse interface
     const studentData = apiResponse.data;
+    const responsePageSize = Number(studentData.pageSize ?? studentData.size);
+    const responseCurrentPage = Number(
+      studentData.currentPage ?? studentData.pageNumber
+    );
     return {
       data: studentData.data,
       totalCount: studentData.totalElements,
       totalPages: studentData.totalPages,
-      currentPage: studentData.currentPage,
-      pageSize: studentData.pageSize,
+      currentPage: Number.isFinite(responseCurrentPage)
+        ? responseCurrentPage
+        : page,
+      pageSize: Number.isFinite(responsePageSize)
+        ? responsePageSize
+        : pageSize,
       hasNext: studentData.hasNext,
       hasPrevious: studentData.hasPrevious,
     };

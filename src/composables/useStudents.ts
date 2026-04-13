@@ -37,8 +37,15 @@ export function useStudents() {
       students.value = response.data;
       totalCount.value = response.totalCount;
       totalPages.value = response.totalPages;
-      currentPage.value = response.currentPage;
-      pageSize.value = response.pageSize;
+      const resolvedCurrentPage = Number(response.currentPage);
+
+      currentPage.value =
+        Number.isFinite(resolvedCurrentPage) && resolvedCurrentPage > 0
+          ? resolvedCurrentPage
+          : page;
+      // Keep the requested page size as source of truth on frontend.
+      // Some backends always return a default pageSize (e.g. 10) in payload.
+      pageSize.value = pageSize_;
       
       if (searchParams !== undefined) currentSearchParams.value = searchParams;
       if (sortBy !== undefined) currentSortBy.value = sortBy;
