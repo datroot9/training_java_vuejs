@@ -166,15 +166,23 @@ const navigateToLogin = () => {
   min-height: 100vh;
   gap: 10px;
   width: 100%;
+  padding: 20px;
+  background-image:
+    linear-gradient(rgba(6, 78, 59, 0.55), rgba(6, 78, 59, 0.55)),
+    url("@/assets/app.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .register-container {
   width: 400px;
   padding: 30px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  background-color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+  background-color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
 }
 
 h1 {

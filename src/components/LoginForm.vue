@@ -168,15 +168,23 @@ const handleLogin = async () => {
   min-height: 100vh;
   gap: 10px;
   width: 100%;
+  padding: 20px;
+  background-image:
+    linear-gradient(rgba(6, 78, 59, 0.55), rgba(6, 78, 59, 0.55)),
+    url("@/assets/app.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .login-container {
   width: 400px;
   padding: 30px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  background-color: var(--background_color);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+  background-color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
 }
 
 h1 {
@@ -220,9 +228,10 @@ h1 {
   text-align: center;
   padding: 10px;
   width: 400px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: var(--background_color);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 14px;
+  background-color: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(4px);
 }
 
 .sign-up-options p {
