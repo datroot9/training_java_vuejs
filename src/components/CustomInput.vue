@@ -11,9 +11,12 @@
         :type="inputType"
         :maxlength="maxlength"
         :placeholder="placeholder"
+        :aria-invalid="isInvalid ? 'true' : undefined"
+        :aria-describedby="describedByIds || undefined"
         :class="{ 
           'has-prefix-icon': !!$slots.icon,
-          'has-suffix-icon': type === 'password' 
+          'has-suffix-icon': type === 'password',
+          'input-error': isInvalid
         }"
       />
 
@@ -31,7 +34,7 @@
     </div>
     
     <!-- Render dòng chữ cảnh báo lỗi nếu prop error được cung cấp -->
-    <span v-if="error" class="length-warning">{{ error }}</span>
+    <span v-if="error" :id="`${id}-error`" class="length-warning" role="alert">{{ error }}</span>
   </div>
 </template>
 
@@ -45,7 +48,20 @@ const props = defineProps({
   type: { type: String, default: 'text' },
   placeholder: { type: String, default: '' },
   maxlength: { type: Number, default: undefined },
-  error: { type: String, default: '' }
+  error: { type: String, default: '' },
+  /** Red border without field text (e.g. shared login failure on both inputs) */
+  highlightInvalid: { type: Boolean, default: false },
+  /** Extra element id for aria-describedby (e.g. shared server error message) */
+  serverErrorId: { type: String, default: '' }
+})
+
+const isInvalid = computed(() => !!props.error || props.highlightInvalid)
+
+const describedByIds = computed(() => {
+  const parts: string[] = []
+  if (props.error) parts.push(`${props.id}-error`)
+  if (props.serverErrorId) parts.push(props.serverErrorId)
+  return parts.length ? parts.join(' ') : ''
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -112,6 +128,15 @@ input:focus {
   outline: none;
   border-color: #4CAF50;
   box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+}
+
+input.input-error {
+  border-color: #ff4d4f;
+}
+
+input.input-error:focus {
+  border-color: #ff4d4f;
+  box-shadow: 0 0 5px rgba(255, 77, 79, 0.25);
 }
 
 .length-warning {

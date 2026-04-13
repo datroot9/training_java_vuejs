@@ -14,14 +14,27 @@
           :type="field.type"
           :maxlength="field.maxlength"
           :placeholder="field.placeholder"
-          :error="isSubmitted ? field.error : ''"
+          :error="field.error"
+          :highlight-invalid="!!loginError"
+          :server-error-id="loginError ? 'login-api-error' : ''"
         >
           <template #icon>
             <component :is="field.icon" class="input-icon" />
           </template>
         </CustomInput>
 
-        <button type="submit" class="login-btn">Login</button>
+        <p
+          v-if="loginError"
+          id="login-api-error"
+          class="login-api-error"
+          role="alert"
+        >
+          {{ loginError }}
+        </p>
+
+        <button type="submit" class="login-btn" :disabled="isLoading">
+          {{ isLoading ? "Signing in…" : "Login" }}
+        </button>
       </form>
     </div>
 
@@ -34,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { User as UserIcon, Lock as LockIcon } from "lucide-vue-next";
 import CustomInput from "./CustomInput.vue";
 import { useRouter } from "vue-router";
@@ -46,6 +59,8 @@ const userName = ref("");
 const password = ref("");
 const isSubmitted = ref(false); // Cờ lưu trạng thái đã bấm nút Login
 const isLoading = ref(false);
+/** Set when the API rejects login (wrong email/password, etc.) */
+const loginError = ref("");
 const router = useRouter();
 
 const { validateUserName, validatePassword } = useValidation();
@@ -61,7 +76,7 @@ const formFields = computed(() => [
     type: "text",
     maxlength: 20,
     placeholder: "Email address",
-    error: userNameError.value,
+    error: isSubmitted.value ? userNameError.value : "",
     icon: UserIcon,
   },
   {
@@ -71,14 +86,52 @@ const formFields = computed(() => [
     type: "password",
     maxlength: 15,
     placeholder: "Enter your password",
-    error: passwordError.value,
+    error: isSubmitted.value ? passwordError.value : "",
     icon: LockIcon,
   },
 ]);
 
+watch([userName, password], () => {
+  loginError.value = "";
+});
+
 import { AUTH_USER_KEY, AUTH_ROLE_KEY } from "@/utils/constants";
 
+/** Turns API login errors into plain, supportive copy (no “which field was wrong”). */
+function toFriendlyLoginError(raw: unknown): string {
+  const msg = typeof raw === "string" ? raw.trim() : "";
+  const lower = msg.toLowerCase();
+
+  if (!msg) {
+    return "We couldn’t sign you in. Please check your email and password and try again.";
+  }
+
+  if (
+    lower.includes("invalid email") ||
+    lower.includes("invalid password") ||
+    lower.includes("invalid credentials") ||
+    lower.includes("wrong password") ||
+    lower.includes("bad credentials") ||
+    lower.includes("incorrect username or password") ||
+    lower.includes("incorrect email or password") ||
+    lower === "unauthorized"
+  ) {
+    return "We couldn’t sign you in with those details. Double-check your email and password, then try again.";
+  }
+
+  if (
+    lower.includes("network") ||
+    lower.includes("failed to fetch") ||
+    lower.includes("load failed")
+  ) {
+    return "We couldn’t reach the server. Check your connection and try again.";
+  }
+
+  return msg;
+}
+
 const handleLogin = async () => {
+  loginError.value = "";
   isSubmitted.value = true; // Bật cờ đã submit để hiển thị thông báo lỗi (nếu có)
 
   if (userNameError.value || passwordError.value) {
@@ -99,7 +152,7 @@ const handleLogin = async () => {
     router.push("/screens");
   } catch (error: any) {
     console.error("Error during login:", error);
-    alert(error.message || "Login failed. Please check your credentials and try again.");
+    loginError.value = toFriendlyLoginError(error?.message);
   } finally {
     isLoading.value = false;
   }
@@ -145,6 +198,22 @@ h1 {
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s;
+}
+
+.login-btn:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.login-api-error {
+  color: #ff4d4f;
+  font-size: 13px;
+  font-weight: 600;
+  margin: -8px 0 16px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  background: rgba(255, 77, 79, 0.08);
+  border: 1px solid rgba(255, 77, 79, 0.25);
 }
 
 .sign-up-options {
